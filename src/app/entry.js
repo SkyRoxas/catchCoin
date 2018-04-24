@@ -14,35 +14,37 @@ const game = new CanvasCatchCoin(
 
 game.setCoins = [
   {
-    name: '1',
-    file: './images/sprites/coin-rotate.json',
-    length: 6,
-    speed: 1,
-    probability: [10, 10],
+    name: '銅幣',
+    image: './images/coin/coin_level1.png',
+    speed: 200,
+    width: 20,
+    height: 20,
+    scale: 5,
     action: function(){
-      alert(123)
+      console.log('銅幣')
     }
   },
-  // {
-  //   name: '2',
-  //   file: './images/sprites/coin-rotate2.json',
-  //   length: 6,
-  //   speed: 1,
-  //   probability: [1, 10],
-  //   action: function(){
-  //     alert(123)
-  //   }
-  // },
-  // {
-  //   name: '3',
-  //   // file: './images/sprites/coin-rotate2.json',
-  //   length: 6,
-  //   speed: 1,
-  //   probability: [1, 10],
-  //   action: function(){
-  //     alert(123)
-  //   }
-  // }
+  {
+    name: '銀幣',
+    image: './images/coin/coin_level2.png',
+    speed: 300,
+    width: 20,
+    height: 20,
+    scale: 3,
+    action: function(){
+      console.log('銀幣')
+    }
+  },
+  {
+    name: '金幣',
+    file: './images/sprites/coin-rotate.json',
+    length: 6,
+    speed: 300,
+    scale: 2,
+    action: function(){
+      console.log('金幣')
+    }
+  }
 ]
 
 console.log(game)
