@@ -1,31 +1,48 @@
 import CanvasCatchCoin from './canvasCatchCoin'
 
+const game = new CanvasCatchCoin()
 
-const game = new CanvasCatchCoin(
-  {
-    width: 960,
-    height: 720,
-    timer: 1,
-    productionSpeed: 1,
-    dropSpeed: 1,
-    eventMode: 'kepress'
+game.option = {
+  width: window.innerWidth,
+  height: window.innerHeight,
+  timer: 1,
+  productionSpeed: 1,
+  dropSpeed: 1
+}
+
+game.basket = {
+  width: 300,
+  height: 204,
+  image: './images/basket/basket.png',
+  speed: '',
+  eventMode: 'kepress',
+}
+
+game.countBoard = {
+  fontText: 'COUNT:',
+  pixiOption: {
+    fontWeight: 'bold',
+    fontStyle: 'italic',
+    fontSize: 60,
+    fontFamily: 'Arvo',
+    fill: '#3e1707',
+    align: 'center',
+    stroke: '#a4410e',
+    strokeThickness: 7
   }
-)
+}
 
-game.setCoins = [
+game.coins = [
   {
-    name: '銅幣',
+    score: 10,
     image: './images/coin/coin_level1.png',
     speed: 200,
     width: 20,
     height: 20,
-    scale: 5,
-    action: function(){
-      console.log('銅幣')
-    }
+    scale: 5
   },
   {
-    name: '銀幣',
+    score: 100,
     image: './images/coin/coin_level2.png',
     speed: 300,
     width: 20,
@@ -36,18 +53,13 @@ game.setCoins = [
     }
   },
   {
-    name: '金幣',
+    score: 1000,
     file: './images/sprites/coin-rotate.json',
     length: 6,
     speed: 300,
-    scale: 2,
-    action: function(){
-      console.log('金幣')
-    }
+    scale: 2
   }
 ]
-
-console.log(game)
 
 window.addEventListener('load', function(){
   game.start()

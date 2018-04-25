@@ -1,40 +1,140 @@
 import * as PIXI from 'pixi.js'
+import keyCode from './keycode'
 
+const app = new PIXI.Application(window.innerWidth, window.innerHeight, {
+  backgroundColor: 0x1099bb
+})
 
 class CanvasCatchCoin {
 
-  constructor(opt) {
-    this.width = opt.width
-    this.height = opt.height
-    this.timer = opt.timer
-    this.productionSpeed = opt.productionSpeed
-    this.dropSpeed = opt.dropSpeed
-    this.eventMode = opt.eventMode
-    this.coins = opt.coins
+  constructor(opt = {}) {
+    this.option = opt.option ? opt.option : {}
+    this.coins = opt.option ? opt.option : []
+    this.basket = opt.basket ? opt.basket : {}
+    this.countBoard = opt.countBoard ? opt.countBoard : {}
   }
 
-  // Init
+  // step
   init() {
+    const {
+      option
+    } = this
     const {
       width,
       height
-    } = this
-    this.app = new PIXI.Application(width, height, {
-      backgroundColor: 0x1099bb
-    })
-    document.body.appendChild(this.app.view)
+    } = option
+
+    if (width) {
+      app.view.width = width
+    }
+
+    if (height) {
+      app.view.height = height
+    }
+
+    document.body.appendChild(app.view)
   }
 
-  // Action Hook
   beforePIXILoader() {
     this.addLoaderCoins()
+    this.addLoaderBasket()
   }
 
   onPIXILoader() {
-    this.animateCoins()
+
+    let { option } = this
+    let { width, height } = option
+
+    let t = 0
+    let time = 1
+    let lastSec = 0
+    let score = 0
+
+    let coins = this.createCoins()
+
+    let basket = new Basket(this.basket)
+    let basketAnim = basket.pixiAnimate
+
+    let countBoard = new CountBoard(this.countBoard)
+    let countBoardAnim = countBoard.pixiAnimate
+
+    const catchCoinAnimate = function(delta) {
+
+      t += delta
+      const sec = Math.floor(t / app.ticker.FPS)
+
+      if (sec >= 1 * time) {
+        coins = coins.concat(this.createCoins())
+        time++
+      }
+
+      for (let i = 0; i < coins.length; i++) {
+        const {
+          speed,
+          action
+        } = coins[i]
+
+        const coinAnim = coins[i].pixiAnimate
+        coinAnim.y += ((speed + coinAnim.gravity) * delta) / app.ticker.FPS
+
+        if (coinAnim.y - coinAnim.height > height) {
+          app.stage.removeChild(coinAnim)
+          coins.splice(i, 1)
+        }
+
+        if (coinAnim.y > basketAnim.y &&
+          coinAnim.x + (coinAnim.width / 2) > basketAnim.x &&
+          coinAnim.x - (coinAnim.width / 2) < basketAnim.x + basketAnim.width
+        ) {
+          if (action) {
+            action()
+          }
+          countBoardAnim.text = `${countBoard.fontText} ${score += coins[i].score}  `
+
+          app.stage.removeChild(coinAnim)
+          coins.splice(i, 1)
+        }
+      }
+    }
+
+    app.ticker.add(catchCoinAnimate.bind(this))
+  }
+
+  start() {
+    this.init()
+
+    this.beforePIXILoader()
+
+    PIXI.loader.load(this.onPIXILoader.bind(this))
   }
 
   // Coins
+  createCoins() {
+    let {
+      coins
+    } = this
+    let prizeArr = []
+    let arr = []
+    let max = Tool.createRandom(3, 10)
+    let total = 0
+
+    for (let i = 0; i < coins.length; i++) {
+      total += coins[i].scale
+    }
+
+    for (let i = 0; i < coins.length; i++) {
+
+      let timer = (coins[i].scale / total) * max
+
+      for (let t = 0; t < timer; t++) {
+        arr.push(new Coin(coins[i]))
+      }
+    }
+
+    return arr
+  }
+
+  // AddLoader
   addLoaderCoins() {
     const {
       coins
@@ -49,148 +149,119 @@ class CanvasCatchCoin {
     })
   }
 
-  createCoins() {
-    let {
-      coins
+  addLoaderBasket() {
+    const {
+      basket
     } = this
-    let prizeArr = []
-    let arr = []
-    let max = Tool.createRandom(3, 10)
-    let total = 0
-
-    for (var i = 0; i < coins.length; i++) {
-      total += coins[i].scale
-    }
-
-    for (var i = 0; i < coins.length; i++) {
-
-      let timer = (coins[i].scale / total) * max
-
-      for (var t = 0; t < timer; t++) {
-        arr.push(new Coin(coins[i]))
-      }
-    }
-
-    return arr
-  }
-
-  animateCoins() {
-    let {
-      app,
-      coins,
-      width,
-      height
-    } = this
-
-    for (var i = 0; i < 20; i++) {
-
-      setTimeout(() => {
-
-        let debugTime = 0
-
-
-        let coins = this.createCoins()
-
-        for (let i = 0; i < coins.length; i++) {
-          const coinAnim = coins[i].pixiAnimate
-
-          const {
-            file,
-            width,
-            height,
-            speed
-          } = coins[i]
-
-          const isSprite = !!file
-
-          if (width) {
-            coinAnim.width = width
-          }
-
-          if (height) {
-            coinAnim.height = height
-          }
-
-          coinAnim.x = Tool.createRandom(0 + coinAnim.width, this.width - coinAnim.width)
-          coinAnim.y = coinAnim.height * -3
-
-          coinAnim.gravity = Math.random()
-          coinAnim.anchor.set(0.5)
-          coinAnim.animationSpeed = 0.2
-          coinAnim.scale.set(0.25 + Math.random() * 0.3)
-
-          if (isSprite) {
-            coinAnim.play()
-          }
-
-          app.stage.addChild(coinAnim)
-        }
-
-        const coinDrop = function(delta) {
-
-          let statue = false
-
-          for (var i = 0; i < coins.length; i++) {
-            const {
-              speed,
-              action
-            } = coins[i]
-
-            const coinAnim = coins[i].pixiAnimate
-            coinAnim.y += ((speed + coinAnim.gravity) * delta) / app.ticker.FPS
-            coinAnim.rotation += 0.01
-
-
-            if (coinAnim.y > height) {
-              action()
-              coinAnim.y = 100
-              app.stage.removeChild(coinAnim)
-              coins.splice(i, 1)
-            }
-          }
-        }
-
-        app.ticker.add(coinDrop)
-
-
-
-      }, i * 1000)
-    }
-
-
-  }
-
-  // Catch
-
-  // Run Code Function
-  start() {
-    this.init()
-
-    this.beforePIXILoader()
-
-    PIXI.loader.load(() => {
-      this.onPIXILoader()
-    })
-
-  }
-
-  // Set Props
-  set setCoins(arr) {
-    this.coins = arr
+    const {
+      file,
+      image
+    } = basket
+    PIXI.loader.add(file ? file : image)
   }
 }
 
-class Coin {
+class PixiImage {
   constructor(opt) {
-    this.name = opt.name
     this.width = opt.width
     this.height = opt.height
     this.image = opt.image
     this.file = opt.file
     this.length = opt.length
-    this.speed = opt.speed
-    this.action = opt.action
     this.pixiAnimate = this.file ? new PIXI.extras.AnimatedSprite(PIXITool.getSpriiteFrames(this.file, this.length)) : PIXI.Sprite.fromImage(this.image)
+  }
+}
+
+class Coin extends PixiImage {
+  constructor(opt) {
+    super(opt)
+
+    this.speed = opt.speed
+    this.score = opt.score
+    this.action = opt.action
+
+    const {
+      pixiAnimate,
+      file,
+      width,
+      height
+    } = this
+    const isSprite = !!file
+
+    if (width) {
+      pixiAnimate.width = width
+    }
+
+    if (height) {
+      pixiAnimate.height = height
+    }
+
+    pixiAnimate.x = Tool.createRandom(0 + pixiAnimate.width, window.innerWidth)
+    pixiAnimate.y = pixiAnimate.height * -4
+
+    pixiAnimate.gravity = Math.random()
+    pixiAnimate.anchor.set(0.5)
+    pixiAnimate.animationSpeed = 0.2
+    pixiAnimate.scale.set(0.25 + Math.random() * 0.3)
+
+    if (isSprite) {
+      pixiAnimate.play()
+    }
+
+    app.stage.addChild(pixiAnimate)
+  }
+}
+
+class Basket extends PixiImage {
+  constructor(opt) {
+    super(opt)
+
+    const {
+      pixiAnimate,
+      width,
+      height
+    } = this
+
+    pixiAnimate.width = width
+    pixiAnimate.height = height
+    pixiAnimate.x = window.innerWidth / 2 - width / 2
+    pixiAnimate.y = window.innerHeight - height
+
+    app.stage.addChild(pixiAnimate)
+
+    window.addEventListener('keydown', function(e) {
+      if (keyCode(e, 'left')) {
+        if (pixiAnimate.x - 100 > 0) {
+          pixiAnimate.x -= 100
+        } else {
+          pixiAnimate.x = 0
+        }
+      }
+
+      if (keyCode(e, 'right')) {
+        if (pixiAnimate.x + 100 + pixiAnimate.width < app.screen.width) {
+          pixiAnimate.x += 100
+        } else {
+          pixiAnimate.x = app.screen.width - pixiAnimate.width
+        }
+      }
+    })
+  }
+}
+
+class CountBoard {
+  constructor(opt= {}) {
+    this.fontText = opt.fontText
+    this.pixiOption = opt.pixiOption
+    
+    this.pixiAnimate = new PIXI.Text(`${this.fontText} 0  `, this.pixiOption)
+
+    const { pixiAnimate } = this
+
+    pixiAnimate.x = 0
+    pixiAnimate.y = 0
+
+    app.stage.addChild(pixiAnimate)
   }
 }
 
@@ -200,7 +271,7 @@ class PIXITool {
     let frames = []
     let fileName = spriteJson.match(/.+\/(.+)\.json/) ? spriteJson.match(/.+\/(.+)\.json/)[1] : ''
 
-    for (var i = 0; i < spriteLength; i++) {
+    for (let i = 0; i < spriteLength; i++) {
       frames.push(PIXI.Texture.fromFrame(fileName + i + '.png'))
     }
 
@@ -220,23 +291,3 @@ class Tool {
 
 
 export default CanvasCatchCoin
-
-// 整體設定
-//
-// 遊戲時間 （秒）
-// 生產金幣時間頻率 （秒）
-// 金幣掉落速度 （秒）
-// 每次金幣產生的上限數量
-// 操作模式： kepress, mouse, touch, deviceorientation (陀螺儀)
-
-// 金幣物件
-//
-// 名稱
-// 觸發事件
-// 背景圖片
-// 下降速率
-// 出現比例
-//
-//
-// 將有 file 參數的物件 存取為 sprite 物件  （實作 實例 sprite 物件）
-// 實作一個執行金幣動畫的 function ， 且需隨機性的實例化需執行動畫的物件

@@ -7,6 +7,7 @@
   const sass = require('gulp-sass')
   const browserSync = require('browser-sync').create()
   const imagemin = require('gulp-imagemin')
+  const sourcemaps = require('gulp-sourcemaps')
 
   const config = {
     src: {
@@ -17,14 +18,14 @@
     },
     dest: {
       js: './dest/js',
-      sass: './dest/css/style',
+      sass: './dest/css/',
       html: './dest/',
       image: './dest/images'
     }
   }
 
   const minifyJS = function() {
-    return gulp.src(config.src.js).pipe(webpack(require('./webpack.config.js'))).pipe(gulp.dest(config.dest.js)).pipe(browserSync.reload({stream: true, once: true}))
+    return gulp.src(config.src.js).pipe(sourcemaps.init()).pipe(webpack(require('./webpack.config.js'))).pipe(sourcemaps.write()).pipe(gulp.dest(config.dest.js)).pipe(browserSync.reload({stream: true, once: true}))
   }
 
   const minifySASS = function() {
