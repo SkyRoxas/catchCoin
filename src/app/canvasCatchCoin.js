@@ -20,7 +20,9 @@ class CanvasCatchCoin {
     const {
       option
     } = this
+
     const {
+      id,
       width,
       height
     } = option
@@ -33,7 +35,7 @@ class CanvasCatchCoin {
       app.view.height = height
     }
 
-    document.body.appendChild(app.view)
+    document.getElementById(id).appendChild(app.view)
   }
 
   // AddLoader
@@ -100,8 +102,13 @@ class CanvasCatchCoin {
 
   onPIXILoader() {
 
-    let { option } = this
-    let { width, height } = option
+    let {
+      option
+    } = this
+    let {
+      width,
+      height
+    } = option
 
     let numberExecutions = 1
     let deltaCount = 0
@@ -131,8 +138,14 @@ class CanvasCatchCoin {
 
       // 固定時間內，加入新的一批 coin 的陣列
       if (deltaSec >= 1 * numberExecutions && !isGameOver) {
+
         timerAnim.text = `${timer.fontText} ${timer.sec - deltaSec} `
-        coins = coins.concat(this.createCoins())
+
+        // 提前 3 秒停止產生金幣
+        if (!(timer.sec - deltaSec < 3)) {
+          coins = coins.concat(this.createCoins())
+        }
+
         numberExecutions++
       }
 
@@ -179,7 +192,9 @@ class CanvasCatchCoin {
   }
 
   gameOver(result) {
-    const { score } = result
+    const {
+      score
+    } = result
     alert(`GAME OVER!! Your score is ${score} `)
   }
 
@@ -247,7 +262,10 @@ class Coin extends PixiImage {
   }
 
   move(delta) {
-    const {pixiAnimate, speed} = this
+    const {
+      pixiAnimate,
+      speed
+    } = this
     pixiAnimate.y += ((speed + pixiAnimate.gravity) * delta) / app.ticker.FPS
   }
 }
@@ -286,26 +304,31 @@ class Basket extends PixiImage {
       speed
     } = this
 
-    let {isMoving, position} = this
+    let {
+      isMoving,
+      position
+    } = this
 
     // console.log(position,'position')
 
-    if ( position === 'right') {
+    if (position === 'right') {
       if (pixiAnimate.x + pixiAnimate.width < app.screen.width) {
         pixiAnimate.x += (speed * delta) / app.ticker.FPS
       }
     }
 
-    if ( position === 'left') {
-      if( pixiAnimate.x > 0) {
+    if (position === 'left') {
+      if (pixiAnimate.x > 0) {
         pixiAnimate.x -= (speed * delta) / app.ticker.FPS
       }
     }
   }
 
-  moveEvnet(){
+  moveEvnet() {
 
-    let { position } = this
+    let {
+      position
+    } = this
 
     window.addEventListener('keydown', function(e) {
 
@@ -322,13 +345,15 @@ class Basket extends PixiImage {
 }
 
 class CountBoard {
-  constructor(opt= {}) {
+  constructor(opt = {}) {
     this.fontText = opt.fontText
     this.fontStyle = opt.fontStyle
 
     this.pixiAnimate = new PIXI.Text(`${this.fontText} 0  `, this.fontStyle)
 
-    const { pixiAnimate } = this
+    const {
+      pixiAnimate
+    } = this
 
     pixiAnimate.x = 0
     pixiAnimate.y = 0
@@ -338,14 +363,18 @@ class CountBoard {
 }
 
 class Timer {
-  constructor(opt= {}) {
+  constructor(opt = {}) {
     this.sec = opt.sec
     this.fontText = opt.fontText
     this.fontStyle = opt.fontStyle
-
     this.pixiAnimate = new PIXI.Text(`${this.fontText} ${this.sec}  `, this.fontStyle)
 
-    const { pixiAnimate } = this
+    this.init()
+  }
+  init() {
+    const {
+      pixiAnimate
+    } = this
 
     pixiAnimate.x = 0
     pixiAnimate.y = 80
@@ -380,3 +409,8 @@ class Tool {
 
 
 export default CanvasCatchCoin
+
+
+window.onload = function(){
+
+}

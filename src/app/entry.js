@@ -1,6 +1,10 @@
+import axios from 'axios'
 import CanvasCatchCoin from './canvasCatchCoin'
 
-const level = function(score){
+const RootAPI = 'https://event.shopping.friday.tw/playfullgift/Event20180536961Action.do?eventPage=game'
+const ResStatusError = []
+
+const resultLevel = function(score){
   switch (true) {
     case (score > 3600):
       return 5
@@ -22,6 +26,7 @@ const level = function(score){
 const game = new CanvasCatchCoin()
 
 game.option = {
+  id: 'catchCoin',
   width: window.innerWidth,
   height: window.innerHeight,
   timer: 1,
@@ -52,7 +57,7 @@ game.countBoard = {
 }
 
 game.timer = {
-  sec: 15,
+  sec: 10,
   fontText: 'Time:',
   fontStyle: {
     fontWeight: 'bold',
@@ -97,7 +102,29 @@ game.coins = [
 
 game.gameOver = function(result){
   const { score } = result
-  console.log(`分數 ${score} : ${ level(score) } 星`)
+  const level = resultLevel(score)
+
+  // axios.post(RootAPI, {
+  //   score: score,
+  //   level: level
+  // })
+  // .then( res => {
+  //   if( ResStatusError.indexOf(res.status) !== -1) {
+  //     throw new Error('Network response was not ok.')
+  //   }
+  // })
+  // .catch( res => {
+  //   console.log('error')
+  //   localStorage.setItem('gameResult',JSON.stringify(
+  //     {
+  //       score: score,
+  //       level: level
+  //     }
+  //   ))
+  // })
+
+
+  console.log(`分數 ${score} : ${level} 星`)
 }
 
 window.addEventListener('load', function(){
