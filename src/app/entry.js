@@ -1,5 +1,24 @@
 import CanvasCatchCoin from './canvasCatchCoin'
 
+const level = function(score){
+  switch (true) {
+    case (score > 3600):
+      return 5
+      break;
+    case (score > 2000):
+      return 4
+      break
+    case (score > 1200):
+      return 3
+      break
+    case (score > 800):
+      return 2
+      break
+    default:
+      return 1
+  }
+}
+
 const game = new CanvasCatchCoin()
 
 game.option = {
@@ -14,13 +33,28 @@ game.basket = {
   width: 300,
   height: 204,
   image: './images/basket/basket.png',
-  speed: '',
+  speed: 300,
   eventMode: 'kepress',
 }
 
 game.countBoard = {
   fontText: 'COUNT:',
-  pixiOption: {
+  fontStyle: {
+    fontWeight: 'bold',
+    fontStyle: 'italic',
+    fontSize: 60,
+    fontFamily: 'Arvo',
+    fill: '#3e1707',
+    align: 'center',
+    stroke: '#a4410e',
+    strokeThickness: 7
+  }
+}
+
+game.timer = {
+  sec: 15,
+  fontText: 'Time:',
+  fontStyle: {
     fontWeight: 'bold',
     fontStyle: 'italic',
     fontSize: 60,
@@ -34,7 +68,7 @@ game.countBoard = {
 
 game.coins = [
   {
-    score: 10,
+    score: 100,
     image: './images/coin/coin_level1.png',
     speed: 200,
     width: 20,
@@ -42,7 +76,7 @@ game.coins = [
     scale: 5
   },
   {
-    score: 100,
+    score: 300,
     image: './images/coin/coin_level2.png',
     speed: 300,
     width: 20,
@@ -53,13 +87,18 @@ game.coins = [
     }
   },
   {
-    score: 1000,
+    score: 500,
     file: './images/sprites/coin-rotate.json',
     length: 6,
     speed: 300,
     scale: 2
   }
 ]
+
+game.gameOver = function(result){
+  const { score } = result
+  console.log(`分數 ${score} : ${ level(score) } 星`)
+}
 
 window.addEventListener('load', function(){
   game.start()
