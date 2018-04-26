@@ -57,7 +57,7 @@ game.countBoard = {
 }
 
 game.timer = {
-  sec: 10,
+  sec: 60,
   fontText: 'Time:',
   fontStyle: {
     fontWeight: 'bold',
@@ -100,32 +100,32 @@ game.coins = [
   }
 ]
 
-game.gameOver = function(result){
-  const { score } = result
-  const level = resultLevel(score)
-
-  // axios.post(RootAPI, {
-  //   score: score,
-  //   level: level
-  // })
-  // .then( res => {
-  //   if( ResStatusError.indexOf(res.status) !== -1) {
-  //     throw new Error('Network response was not ok.')
-  //   }
-  // })
-  // .catch( res => {
-  //   console.log('error')
-  //   localStorage.setItem('gameResult',JSON.stringify(
-  //     {
-  //       score: score,
-  //       level: level
-  //     }
-  //   ))
-  // })
-
-
-  console.log(`分數 ${score} : ${level} 星`)
-}
+// game.gameOver = function(result){
+//   const { score } = result
+//   const level = resultLevel(score)
+//
+//   axios.post(RootAPI, {
+//     score: score,
+//     level: level
+//   })
+//   .then( res => {
+//     if( ResStatusError.indexOf(res.status) !== -1) {
+//       throw new Error('Network response was not ok.')
+//     }
+//   })
+//   .catch( res => {
+//     console.log('error')
+//     localStorage.setItem('gameResult',JSON.stringify(
+//       {
+//         score: score,
+//         level: level
+//       }
+//     ))
+//   })
+//
+//
+//   console.log(`分數 ${score} : ${level} 星`)
+// }
 
 window.addEventListener('load', function(){
   game.start()

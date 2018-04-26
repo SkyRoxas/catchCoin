@@ -1,9 +1,7 @@
 import * as PIXI from 'pixi.js'
 import keyCode from './keycode'
 
-const app = new PIXI.Application(window.innerWidth, window.innerHeight, {
-  backgroundColor: 0x1099bb
-})
+let app = {}
 
 class CanvasCatchCoin {
 
@@ -26,6 +24,10 @@ class CanvasCatchCoin {
       width,
       height
     } = option
+
+    app = new PIXI.Application(window.innerWidth, window.innerHeight, {
+      backgroundColor: 0x1099bb
+    })
 
     if (width) {
       app.view.width = width
@@ -245,7 +247,7 @@ class Coin extends PixiImage {
       pixiAnimate.height = height
     }
 
-    pixiAnimate.x = Tool.createRandom(0 + pixiAnimate.width, window.innerWidth)
+    pixiAnimate.x = Tool.createRandom(0 + pixiAnimate.width, app.screen.width - pixiAnimate.width)
     pixiAnimate.y = pixiAnimate.height * -4
 
     pixiAnimate.gravity = Math.random()
@@ -258,6 +260,7 @@ class Coin extends PixiImage {
       pixiAnimate.play()
     }
 
+    app.start()
     app.stage.addChild(pixiAnimate)
   }
 
@@ -292,8 +295,8 @@ class Basket extends PixiImage {
 
     pixiAnimate.width = width
     pixiAnimate.height = height
-    pixiAnimate.x = window.innerWidth / 2 - width / 2
-    pixiAnimate.y = window.innerHeight - height
+    pixiAnimate.x = app.screen.width / 2 - width / 2
+    pixiAnimate.y = app.screen.height - height
 
     app.stage.addChild(pixiAnimate)
   }
@@ -341,6 +344,23 @@ class Basket extends PixiImage {
       }
 
     }.bind(this))
+
+    window.addEventListener('deviceorientation', function(e) {
+      const {
+        alpha,
+        beta,
+        gamma
+      } = e
+
+      if(Math.floor(gamma) > 0){
+        this.setPosition = 'right'
+      }
+
+      if(Math.floor(gamma) < 0){
+        this.setPosition = 'left'
+      }
+
+    }.bind(this), false);
   }
 }
 
@@ -409,8 +429,3 @@ class Tool {
 
 
 export default CanvasCatchCoin
-
-
-window.onload = function(){
-
-}
