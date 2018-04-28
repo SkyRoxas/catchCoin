@@ -46,7 +46,7 @@ class CanvasCatchCoin {
       coins
     } = this
 
-    coins.map((item, idx) => {
+    coins.map(item => {
       const {
         file,
         image
@@ -251,8 +251,6 @@ class Coin extends PixiImage {
     pixiAnimate.y = pixiAnimate.height * -4
 
     pixiAnimate.gravity = Math.random()
-    pixiAnimate.anchor.set(0.5)
-    pixiAnimate.rotation += 0.01
     pixiAnimate.animationSpeed = 0.2
     pixiAnimate.scale.set(0.25 + Math.random() * 0.3)
 
@@ -270,6 +268,8 @@ class Coin extends PixiImage {
       speed
     } = this
     pixiAnimate.y += ((speed + pixiAnimate.gravity) * delta) / app.ticker.FPS
+    pixiAnimate.anchor.set(0.5)
+    pixiAnimate.rotation += 0.01
   }
 }
 
