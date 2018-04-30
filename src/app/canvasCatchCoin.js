@@ -15,15 +15,8 @@ class CanvasCatchCoin {
 
   // init
   init() {
-    const {
-      option
-    } = this
-
-    const {
-      id,
-      width,
-      height
-    } = option
+    const { option } = this
+    const { id, width, height } = option
 
     app = new PIXI.Application(window.innerWidth, window.innerHeight, {
       backgroundColor: 0x1099bb
@@ -42,27 +35,17 @@ class CanvasCatchCoin {
 
   // AddLoader
   addLoaderCoins() {
-    const {
-      coins
-    } = this
+    const { coins } = this
 
     coins.map(item => {
-      const {
-        file,
-        image
-      } = item
+      const { file, image } = item
       PIXI.loader.add(file ? file : image)
     })
   }
 
   addLoaderBasket() {
-    const {
-      basket
-    } = this
-    const {
-      file,
-      image
-    } = basket
+    const { basket } = this
+    const { file, image } = basket
     PIXI.loader.add(file ? file : image)
   }
 
@@ -79,9 +62,7 @@ class CanvasCatchCoin {
     }
 
     for (let i = 0; i < coins.length; i++) {
-
       let timer = (coins[i].scale / total) * max
-
       for (let t = 0; t < timer; t++) {
         arr.push(new Coin(coins[i]))
       }
@@ -96,6 +77,7 @@ class CanvasCatchCoin {
   // Action
 
   beforePIXILoader() {
+
     this.addLoaderCoins()
     this.addLoaderBasket()
   }
@@ -105,31 +87,36 @@ class CanvasCatchCoin {
     let { option } = this
     let { height } = option
 
+    let coins = this.createCoins()
+    let basket = new Basket(this.basket)
+    let timer = new Timer(this.timer)
+    let countBoard = new CountBoard(this.countBoard)
+
+    let basketAnim = basket.pixiAnimate
+    let countBoardAnim = countBoard.pixiAnimate
+    let timerAnim = timer.pixiAnimate
+
+    // 起始狀態資料
     let numberExecutions = 1
     let deltaCount = 0
     let score = 0
 
-    let coins = this.createCoins()
+    // 遊戲結束條件
+    let isTimeUp = false
+    let isSuddenOver = false
 
-    let basket = new Basket(this.basket)
     basket.moveEvnet()
 
-    let basketAnim = basket.pixiAnimate
-
-    let countBoard = new CountBoard(this.countBoard)
-    let countBoardAnim = countBoard.pixiAnimate
-
-    let timer = new Timer(this.timer)
-    let timerAnim = timer.pixiAnimate
-
-    const catchCoinAnimate = function(delta) {
+    const animate = function(delta) {
 
       deltaCount += delta
       const deltaSec = Math.floor(deltaCount / app.ticker.FPS)
-      let isGameOver = timer.sec - deltaSec < 0
+
+      isTimeUp = timer.sec - deltaSec < 0
+
+      let isGameOver = isTimeUp || isSuddenOver
 
       basket.move(delta)
-
 
       // 固定時間內，加入新的一批 coin 的陣列
       if (deltaSec >= 1 * numberExecutions && !isGameOver) {
@@ -145,10 +132,8 @@ class CanvasCatchCoin {
       }
 
       for (let i = 0; i < coins.length; i++) {
-        const {
-          action
-        } = coins[i]
 
+        const { action } = coins[i]
         const coinAnim = coins[i].pixiAnimate
 
         coins[i].move(delta)
@@ -161,13 +146,25 @@ class CanvasCatchCoin {
 
         // coin 於 basketAnim 範圍內時，觸發事件
         if (coinAnim.y > basketAnim.y &&
-          coinAnim.x + (coinAnim.width / 2) > basketAnim.x &&
-          coinAnim.x - (coinAnim.width / 2) < basketAnim.x + basketAnim.width &&
-          !isGameOver
+            coinAnim.y < basketAnim.y + (basketAnim.height * 0.5) &&
+            coinAnim.x + (coinAnim.width / 2) > basketAnim.x &&
+            coinAnim.x - (coinAnim.width / 2) < basketAnim.x + basketAnim.width &&
+            !isGameOver
         ) {
           if (action) {
-            action()
+            const game = {
+              score: this.score,
+              stopGame() {
+                isSuddenOver = true
+                if (isGameOver && coins.length === 0) {
+                  app.ticker.stop(animate.bind(this))
+                  this.gameOver({ score: score })
+                }
+              }
+            }
+            action(game)
           }
+
           countBoardAnim.text = `${countBoard.fontText} ${score += coins[i].score}  `
           app.stage.removeChild(coinAnim)
           coins.splice(i, 1)
@@ -175,7 +172,7 @@ class CanvasCatchCoin {
 
         // 時間倒數結束時，停止動畫，且觸發事件
         if (isGameOver && coins.length === 0) {
-          app.ticker.stop(catchCoinAnimate.bind(this))
+          app.ticker.stop(animate.bind(this))
           this.gameOver({
             score: score
           })
@@ -183,13 +180,11 @@ class CanvasCatchCoin {
       }
     }
 
-    app.ticker.add(catchCoinAnimate.bind(this))
+    app.ticker.add(animate.bind(this))
   }
 
   gameOver(result) {
-    const {
-      score
-    } = result
+    const { score } = result
     alert(`GAME OVER!! Your score is ${score} `)
   }
 

@@ -86,10 +86,7 @@ game.coins = [
     speed: 300,
     width: 20,
     height: 20,
-    scale: 3,
-    action: function(){
-      console.log('銀幣')
-    }
+    scale: 1
   },
   {
     score: 500,
