@@ -2,13 +2,13 @@ import axios from 'axios'
 import CanvasCatchCoin from './canvasCatchCoin'
 
 const RootAPI = 'https://event.shopping.friday.tw/playfullgift/Event20180536961Action.do?eventPage=game'
-const ResStatusError = []
+const ResStatusError = [201]
 
 const resultLevel = function(score){
   switch (true) {
     case (score > 3600):
       return 5
-      break;
+      break
     case (score > 2000):
       return 4
       break
@@ -100,32 +100,32 @@ game.coins = [
   }
 ]
 
-// game.gameOver = function(result){
-//   const { score } = result
-//   const level = resultLevel(score)
-//
-//   axios.post(RootAPI, {
-//     score: score,
-//     level: level
-//   })
-//   .then( res => {
-//     if( ResStatusError.indexOf(res.status) !== -1) {
-//       throw new Error('Network response was not ok.')
-//     }
-//   })
-//   .catch( res => {
-//     console.log('error')
-//     localStorage.setItem('gameResult',JSON.stringify(
-//       {
-//         score: score,
-//         level: level
-//       }
-//     ))
-//   })
-//
-//
-//   console.log(`分數 ${score} : ${level} 星`)
-// }
+game.gameOver = function(result){
+  const { score } = result
+  const level = resultLevel(score)
+
+  axios.post(RootAPI, {
+    score: score,
+    level: level
+  })
+  .then( res => {
+    if( ResStatusError.indexOf(res.status) !== -1) {
+      throw new Error('Network response was not ok.')
+    }
+  })
+  .catch( () => {
+    console.log('error')
+    localStorage.setItem('gameResult', JSON.stringify(
+      {
+        score: score,
+        level: level
+      }
+    ))
+  })
+
+
+  console.log(`分數 ${score} : ${level} 星`)
+}
 
 window.addEventListener('load', function(){
   game.start()

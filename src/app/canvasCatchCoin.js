@@ -68,10 +68,8 @@ class CanvasCatchCoin {
 
   // Coins
   createCoins() {
-    let {
-      coins
-    } = this
-    let prizeArr = []
+
+    let { coins } = this
     let arr = []
     let max = Tool.createRandom(3, 10)
     let total = 0
@@ -104,13 +102,8 @@ class CanvasCatchCoin {
 
   onPIXILoader() {
 
-    let {
-      option
-    } = this
-    let {
-      width,
-      height
-    } = option
+    let { option } = this
+    let { height } = option
 
     let numberExecutions = 1
     let deltaCount = 0
@@ -302,17 +295,8 @@ class Basket extends PixiImage {
   }
 
   move(delta) {
-    const {
-      pixiAnimate,
-      speed
-    } = this
-
-    let {
-      isMoving,
-      position
-    } = this
-
-    // console.log(position,'position')
+    const { pixiAnimate, speed } = this
+    let { position } = this
 
     if (position === 'right') {
       if (pixiAnimate.x + pixiAnimate.width < app.screen.width) {
@@ -329,10 +313,6 @@ class Basket extends PixiImage {
 
   moveEvnet() {
 
-    let {
-      position
-    } = this
-
     window.addEventListener('keydown', function(e) {
 
       if (keyCode(e, 'left')) {
@@ -346,11 +326,7 @@ class Basket extends PixiImage {
     }.bind(this))
 
     window.addEventListener('deviceorientation', function(e) {
-      const {
-        alpha,
-        beta,
-        gamma
-      } = e
+      const { gamma } = e
 
       if(Math.floor(gamma) > 0){
         this.setPosition = 'right'
@@ -360,7 +336,7 @@ class Basket extends PixiImage {
         this.setPosition = 'left'
       }
 
-    }.bind(this), false);
+    }.bind(this), false)
   }
 }
 
@@ -368,15 +344,14 @@ class CountBoard {
   constructor(opt = {}) {
     this.fontText = opt.fontText
     this.fontStyle = opt.fontStyle
-
+    this.x = opt.x ? opt.x : 0
+    this.y = opt.y ? opt.y : 0
     this.pixiAnimate = new PIXI.Text(`${this.fontText} 0  `, this.fontStyle)
 
-    const {
-      pixiAnimate
-    } = this
+    const {x, y, pixiAnimate } = this
 
-    pixiAnimate.x = 0
-    pixiAnimate.y = 0
+    pixiAnimate.x = x
+    pixiAnimate.y = y
 
     app.stage.addChild(pixiAnimate)
   }
@@ -387,17 +362,17 @@ class Timer {
     this.sec = opt.sec
     this.fontText = opt.fontText
     this.fontStyle = opt.fontStyle
+    this.x = opt.x ? opt.x : 0
+    this.y = opt.y ? opt.y : 80
     this.pixiAnimate = new PIXI.Text(`${this.fontText} ${this.sec}  `, this.fontStyle)
 
     this.init()
   }
   init() {
-    const {
-      pixiAnimate
-    } = this
+    const {x, y, pixiAnimate } = this
 
-    pixiAnimate.x = 0
-    pixiAnimate.y = 80
+    pixiAnimate.x = x
+    pixiAnimate.y = y
 
     app.stage.addChild(pixiAnimate)
   }
@@ -420,7 +395,7 @@ class PIXITool {
 
 class Tool {
   static createRandom(min, max) {
-    return Math.floor(Math.random() * (Math.floor(max) - Math.ceil(min))) + Math.ceil(min);
+    return Math.floor(Math.random() * (Math.floor(max) - Math.ceil(min))) + Math.ceil(min)
   }
   static gcd(m, n) {
     return n === 0 ? m : this.gcd(n, m % n)
