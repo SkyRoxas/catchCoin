@@ -64,6 +64,7 @@ class CanvasCatchCoin {
     for (let i = 0; i < coins.length; i++) {
       let timer = (coins[i].scale / total) * max
       for (let t = 0; t < timer; t++) {
+        coins[i].startFrame = Tool.createRandom(0, coins[i].length)
         arr.push(new Coin(coins[i]))
       }
     }
@@ -204,7 +205,8 @@ class PixiImage {
     this.image = opt.image
     this.file = opt.file
     this.length = opt.length
-    this.pixiAnimate = this.file ? new PIXI.extras.AnimatedSprite(PIXITool.getSpriiteFrames(this.file, this.length)) : PIXI.Sprite.fromImage(this.image)
+    this.startFrame = opt.startFrame
+    this.pixiAnimate = this.file ? new PIXI.extras.AnimatedSprite(PIXITool.getSpriiteFrames(this.file, this.length, this.startFrame)) : PIXI.Sprite.fromImage(this.image)
   }
 }
 
@@ -214,17 +216,11 @@ class Coin extends PixiImage {
     this.speed = opt.speed
     this.score = opt.score
     this.action = opt.action
-
     this.init()
   }
 
   init() {
-    const {
-      pixiAnimate,
-      file,
-      width,
-      height
-    } = this
+    const { pixiAnimate, file, width, height } = this
     const isSprite = !!file
 
     if (width) {
@@ -251,10 +247,7 @@ class Coin extends PixiImage {
   }
 
   move(delta) {
-    const {
-      pixiAnimate,
-      speed
-    } = this
+    const { pixiAnimate, speed } = this
     pixiAnimate.y += ((speed + pixiAnimate.gravity) * delta) / app.ticker.FPS
     pixiAnimate.anchor.set(0.5)
     pixiAnimate.rotation += 0.01
@@ -275,11 +268,7 @@ class Basket extends PixiImage {
   }
 
   init() {
-    const {
-      pixiAnimate,
-      width,
-      height
-    } = this
+    const { pixiAnimate, width, height } = this
 
     pixiAnimate.width = width
     pixiAnimate.height = height
@@ -374,15 +363,23 @@ class Timer {
 }
 
 class PIXITool {
-  static getSpriiteFrames(spriteJson, spriteLength) {
+  static getSpriiteFrames(spriteJson, spriteLength, startIndex) {
 
     let frames = []
     let fileName = spriteJson.match(/.+\/(.+)\.json/) ? spriteJson.match(/.+\/(.+)\.json/)[1] : ''
 
-    for (let i = 0; i < spriteLength; i++) {
-      frames.push(PIXI.Texture.fromFrame(fileName + i + '.png'))
-    }
+    startIndex = startIndex ? startIndex : 0
+    let index = 0
 
+    for (let i = 0; i < spriteLength; i++) {
+      if (startIndex >= spriteLength) {
+        index = Math.abs(spriteLength - startIndex)
+      }else {
+        index = startIndex
+      }
+      startIndex++
+      frames.push(PIXI.Texture.fromFrame(fileName + index + '.png'))
+    }
     return frames
 
   }
