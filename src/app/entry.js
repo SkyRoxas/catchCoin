@@ -6,7 +6,7 @@ const ResStatusError = [201]
 
 const resultLevel = function(score){
   switch (true) {
-    case (score > 3600):
+    case (score > 10000):
       return 5
       break
     case (score > 2000):
@@ -31,7 +31,7 @@ game.option = {
   height: window.innerHeight,
   productionSpeed: 1,
   // backgroundImage: './images/bg.png',
-  maxCoin: 10,
+  maxCoin: 6,
   minCoin: 3
 }
 
@@ -58,7 +58,7 @@ game.countBoard = {
 }
 
 game.timer = {
-  sec: 60,
+  sec: 20,
   fontText: 'Time:',
   fontStyle: {
     fontWeight: 'bold',
@@ -114,8 +114,6 @@ game.controller = {
 game.gameOver = function(result){
   const { score } = result
   const level = resultLevel(score)
-
-  alert(`你的分數為 ${score} ， 等級為 ${level}`)
 
   axios.post(RootAPI, {
     score: score,
