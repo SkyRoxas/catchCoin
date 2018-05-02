@@ -1,4 +1,4 @@
-import * as PIXI from 'pixi.js'
+import * as PIXI from './pixi.min.js'
 import keyCode from './keycode'
 
 let app = {}
@@ -11,14 +11,15 @@ class CanvasCatchCoin {
     this.basket = opt.basket ? opt.basket : {}
     this.countBoard = opt.countBoard ? opt.countBoard : {}
     this.timer = opt.timer ? opt.timer : {}
+    this.controller = opt.controller ? opt.controller : {}
   }
 
   // init
   init() {
     const { option } = this
-    const { id, width, height } = option
+    const { id, width, height, backgroundImage } = option
 
-    app = new PIXI.Application(window.innerWidth, window.innerHeight, {
+    app = new PIXI.Application(width, height, {
       backgroundColor: 0x1099bb
     })
 
@@ -30,10 +31,28 @@ class CanvasCatchCoin {
       app.view.height = height
     }
 
+    if (backgroundImage) {
+      const background = PIXI.Sprite.fromImage(backgroundImage)
+
+      PIXITool.backgroundCover(background)
+
+      app.stage.addChild(background)
+    }
+
     document.getElementById(id).appendChild(app.view)
   }
 
   // AddLoader
+
+  addLoaderBackground() {
+    const { option } = this
+    const { backgroundImage } = option
+    if ( backgroundImage ) {
+      return
+    }
+    PIXI.loader.add(backgroundImage)
+  }
+
   addLoaderCoins() {
     const { coins } = this
 
@@ -47,6 +66,13 @@ class CanvasCatchCoin {
     const { basket } = this
     const { file, image } = basket
     PIXI.loader.add(file ? file : image)
+  }
+
+  addLoaderController() {
+    const { controller } = this
+    const { leftImage, rightImage } = controller
+    PIXI.loader.add(leftImage)
+    PIXI.loader.add(rightImage)
   }
 
   // Coins
@@ -78,20 +104,24 @@ class CanvasCatchCoin {
   // Action
 
   beforePIXILoader() {
-
+    this.addLoaderBackground()
     this.addLoaderCoins()
     this.addLoaderBasket()
+    this.addLoaderController()
   }
 
   onPIXILoader() {
 
     let { option } = this
-    let { height } = option
+    let { height, productionSpeed } = option
+
+    productionSpeed = productionSpeed ? productionSpeed : 1
 
     let coins = this.createCoins()
     let basket = new Basket(this.basket)
     let timer = new Timer(this.timer)
     let countBoard = new CountBoard(this.countBoard)
+    let controller = new Controller(this.controller)
 
     let basketAnim = basket.pixiAnimate
     let countBoardAnim = countBoard.pixiAnimate
@@ -107,6 +137,7 @@ class CanvasCatchCoin {
     let isSuddenOver = false
 
     basket.moveEvnet()
+    controller.moveEvent(basket)
 
     const animate = function(delta) {
 
@@ -124,8 +155,8 @@ class CanvasCatchCoin {
 
         timerAnim.text = `${timer.fontText} ${timer.sec - deltaSec} `
 
-        // 提前 3 秒停止產生金幣
-        if (!(timer.sec - deltaSec < 3)) {
+        // 提前 3 秒停止產生金幣，與產生金幣的頻率
+        if (!(timer.sec - deltaSec < 3) && numberExecutions % productionSpeed === 0) {
           coins = coins.concat(this.createCoins())
         }
 
@@ -165,20 +196,20 @@ class CanvasCatchCoin {
             }
             action(game)
           }
-
           countBoardAnim.text = `${countBoard.fontText} ${score += coins[i].score}  `
           app.stage.removeChild(coinAnim)
           coins.splice(i, 1)
         }
-
-        // 時間倒數結束時，停止動畫，且觸發事件
-        if (isGameOver && coins.length === 0) {
-          app.ticker.stop(animate.bind(this))
-          this.gameOver({
-            score: score
-          })
-        }
       }
+
+      // 時間倒數結束時，停止動畫，且觸發事件
+      if (isGameOver && coins.length === 0) {
+        app.ticker.stop(animate.bind(this))
+        this.gameOver({
+          score: score
+        })
+      }
+
     }
 
     app.ticker.add(animate.bind(this))
@@ -186,7 +217,7 @@ class CanvasCatchCoin {
 
   gameOver(result) {
     const { score } = result
-    alert(`GAME OVER!! Your score is ${score} `)
+    console.log(`GAME OVER!! Your score is ${score} `)
   }
 
   start() {
@@ -236,7 +267,7 @@ class Coin extends PixiImage {
 
     pixiAnimate.gravity = Math.random()
     pixiAnimate.animationSpeed = 0.2
-    pixiAnimate.scale.set(0.25 + Math.random() * 0.3)
+    pixiAnimate.scale.set(0.5 + Math.random() * 0.35)
 
     if (isSprite) {
       pixiAnimate.play()
@@ -324,6 +355,62 @@ class Basket extends PixiImage {
   }
 }
 
+class Controller{
+  constructor(opt){
+    this.x = opt.x ? opt.x : 0
+    this.y = opt.y ? opt.y : 0
+    this.width = opt.width
+    this.height = opt.height
+    this.spacing = opt.spacing ? this.spacing : 0
+    this.leftImage = opt.leftImage
+    this.rightImage = opt.rightImage
+    this.leftButton = PIXI.Sprite.fromImage(this.leftImage)
+    this.rightButton = PIXI.Sprite.fromImage(this.rightImage)
+    this.init()
+  }
+  init(){
+    const { leftButton, rightButton, width, height, x, y, spacing } = this
+
+    let arr = [leftButton, rightButton]
+
+    arr.map(el => {
+      el.x = x
+      el.y = y
+
+      el.interactive = true
+      el.buttonMode = true
+
+      if( width ) {
+        el.width = width
+      }
+      if ( height ) {
+        el.height = height
+      }
+    })
+
+    rightButton.x += (leftButton.width + spacing)
+
+    if(!('ontouchstart' in window)){
+      app.stage.addChild(rightButton)
+      app.stage.addChild(leftButton)
+    }
+  }
+  moveEvent(basket){
+    const { leftButton, rightButton } = this
+
+    // leftButton.interactive = true
+    leftButton.buttonMode = true
+
+    leftButton.on('click', function(){
+      basket.setPosition = 'left'
+    })
+
+    rightButton.on('click', function(){
+      basket.setPosition = 'right'
+    })
+  }
+}
+
 class CountBoard {
   constructor(opt = {}) {
     this.fontText = opt.fontText
@@ -382,6 +469,25 @@ class PIXITool {
     }
     return frames
 
+  }
+
+  static backgroundCover(pxixSprite) {
+    let containerWidth = app.screen.width
+    let containerHeight = app.screen.height
+    let imageRatio = pxixSprite.width / pxixSprite.height
+    let containerRatio = containerWidth / containerHeight
+
+    if(containerRatio > imageRatio) {
+      pxixSprite.height = pxixSprite.height / (pxixSprite.width / containerWidth)
+      pxixSprite.width = containerWidth
+      pxixSprite.position.x = 0
+      pxixSprite.position.y = (containerHeight - pxixSprite.height) / 2
+    }else{
+      pxixSprite.width = pxixSprite.width / (pxixSprite.height / containerHeight)
+      pxixSprite.height = containerHeight
+      pxixSprite.position.y = 0
+      pxixSprite.position.x = (containerWidth - pxixSprite.width) / 2
+    }
   }
 }
 

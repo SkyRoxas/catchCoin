@@ -31,7 +31,7 @@ game.option = {
   height: window.innerHeight,
   timer: 1,
   productionSpeed: 1,
-  dropSpeed: 1
+  backgroundImage: './images/bg.png'
 }
 
 game.basket = {
@@ -57,7 +57,7 @@ game.countBoard = {
 }
 
 game.timer = {
-  sec: 60,
+  sec: 20,
   fontText: 'Time:',
   fontStyle: {
     fontWeight: 'bold',
@@ -74,18 +74,18 @@ game.timer = {
 game.coins = [
   {
     score: 100,
-    image: './images/coin/coin_level1.png',
-    speed: 200,
-    width: 20,
-    height: 20,
+    file: './images/sprites/copper_1.json',
+    length: 6,
+    speed: 400,
+    width: 10,
+    height: 10,
     scale: 5
   },
   {
     score: 300,
-    image: './images/coin/coin_level2.png',
-    speed: 300,
-    width: 20,
-    height: 20,
+    file: './images/sprites/silver_1.json',
+    length: 6,
+    speed: 500,
     scale: 3,
     action: function(){
       console.log('銀幣')
@@ -93,16 +93,28 @@ game.coins = [
   },
   {
     score: 500,
-    file: './images/sprites/coin-rotate.json',
+    file: './images/sprites/golden_1.json',
     length: 6,
-    speed: 300,
+    speed: 600,
     scale: 2
   }
 ]
 
+game.controller = {
+  leftImage: './images/controller/left.png',
+  rightImage: './images/controller/right.png',
+  x: window.innerWidth - (206 * 2),
+  y: window.innerHeight - 260,
+  width: 206,
+  height: 260,
+  spacing: 0
+}
+
 game.gameOver = function(result){
   const { score } = result
   const level = resultLevel(score)
+
+  console.log(123)
 
   axios.post(RootAPI, {
     score: score,
