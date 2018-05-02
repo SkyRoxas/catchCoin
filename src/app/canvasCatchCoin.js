@@ -47,7 +47,7 @@ class CanvasCatchCoin {
   addLoaderBackground() {
     const { option } = this
     const { backgroundImage } = option
-    if ( backgroundImage ) {
+    if ( !backgroundImage ) {
       return
     }
     PIXI.loader.add(backgroundImage)
@@ -78,9 +78,14 @@ class CanvasCatchCoin {
   // Coins
   createCoins() {
 
-    let { coins } = this
+    let { coins, option } = this
+    let {maxCoin, minCoin} = option
+
+    maxCoin = maxCoin ? maxCoin : 10
+    minCoin = minCoin ? minCoin : 3
+
     let arr = []
-    let max = Tool.createRandom(3, 10)
+    let max = Tool.createRandom(minCoin, maxCoin)
     let total = 0
 
     for (let i = 0; i < coins.length; i++) {
@@ -294,15 +299,17 @@ class Basket extends PixiImage {
     this.init()
   }
 
-  set setPosition(value) {
-    this.position = value
-  }
-
   init() {
     const { pixiAnimate, width, height } = this
 
-    pixiAnimate.width = width
-    pixiAnimate.height = height
+    if( width ) {
+      pixiAnimate.width = width
+    }
+
+    if ( height ) {
+      pixiAnimate.height = height
+    }
+
     pixiAnimate.x = app.screen.width / 2 - width / 2
     pixiAnimate.y = app.screen.height - height
 
@@ -310,19 +317,37 @@ class Basket extends PixiImage {
   }
 
   move(delta) {
-    const { pixiAnimate, speed } = this
-    let { position } = this
+    const { pixiAnimate, speed, file } = this
+    let { position, isMoving } = this
+    let isSprite = !!file
 
     if (position === 'right') {
       if (pixiAnimate.x + pixiAnimate.width < app.screen.width) {
         pixiAnimate.x += (speed * delta) / app.ticker.FPS
+        pixiAnimate.scale.x = Math.abs(pixiAnimate.scale.x) * -1
+        pixiAnimate.anchor.set(1, 0)
       }
     }
 
     if (position === 'left') {
       if (pixiAnimate.x > 0) {
         pixiAnimate.x -= (speed * delta) / app.ticker.FPS
+        pixiAnimate.scale.x = Math.abs(pixiAnimate.scale.x)
+        pixiAnimate.anchor.set(0, 0)
       }
+    }
+
+    if(!isSprite) {
+      return
+    }
+    
+    if(position) {
+      this.isMoving = true
+    }
+
+    if(isMoving) {
+      pixiAnimate.animationSpeed = 0.1
+      pixiAnimate.play()
     }
   }
 
@@ -331,11 +356,11 @@ class Basket extends PixiImage {
     window.addEventListener('keydown', function(e) {
 
       if (keyCode(e, 'left')) {
-        this.setPosition = 'left'
+        this.position = 'left'
       }
 
       if (keyCode(e, 'right')) {
-        this.setPosition = 'right'
+        this.position = 'right'
       }
 
     }.bind(this))
@@ -344,11 +369,11 @@ class Basket extends PixiImage {
       const { gamma } = e
 
       if(Math.floor(gamma) > 0){
-        this.setPosition = 'right'
+        this.position = 'right'
       }
 
       if(Math.floor(gamma) < 0){
-        this.setPosition = 'left'
+        this.position = 'left'
       }
 
     }.bind(this), false)
@@ -402,11 +427,11 @@ class Controller{
     leftButton.buttonMode = true
 
     leftButton.on('click', function(){
-      basket.setPosition = 'left'
+      basket.position = 'left'
     })
 
     rightButton.on('click', function(){
-      basket.setPosition = 'right'
+      basket.position = 'right'
     })
   }
 }

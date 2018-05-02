@@ -29,17 +29,18 @@ game.option = {
   id: 'catchCoin',
   width: window.innerWidth,
   height: window.innerHeight,
-  timer: 1,
   productionSpeed: 1,
-  backgroundImage: './images/bg.png'
+  // backgroundImage: './images/bg.png',
+  maxCoin: 10,
+  minCoin: 3
 }
 
 game.basket = {
-  width: 300,
-  height: 204,
-  image: './images/basket/basket.png',
+  width: 500 * 0.8,
+  height: 447 * 0.8,
+  file: './images/sprites/re_3.json',
+  length: 2,
   speed: 300,
-  eventMode: 'kepress',
 }
 
 game.countBoard = {
@@ -57,7 +58,7 @@ game.countBoard = {
 }
 
 game.timer = {
-  sec: 20,
+  sec: 60,
   fontText: 'Time:',
   fontStyle: {
     fontWeight: 'bold',
@@ -114,7 +115,7 @@ game.gameOver = function(result){
   const { score } = result
   const level = resultLevel(score)
 
-  console.log(123)
+  alert(`你的分數為 ${score} ， 等級為 ${level}`)
 
   axios.post(RootAPI, {
     score: score,
