@@ -6,12 +6,13 @@ let app = {}
 class CanvasCatchCoin {
 
   constructor(opt = {}) {
-    this.option = opt.option ? opt.option : {}
-    this.coins = opt.option ? opt.option : []
-    this.basket = opt.basket ? opt.basket : {}
-    this.countBoard = opt.countBoard ? opt.countBoard : {}
-    this.timer = opt.timer ? opt.timer : {}
-    this.controller = opt.controller ? opt.controller : {}
+    this.option = opt.option || {}
+    this.coins = opt.option || []
+    this.basket = opt.basket || {}
+    this.countBoard = opt.countBoard || {}
+    this.timer = opt.timer || {}
+    this.controller = opt.controller || {}
+    this.closeButton = opt.closeButton || {}
   }
 
   // init
@@ -54,6 +55,12 @@ class CanvasCatchCoin {
       return
     }
     PIXI.loader.add(backgroundImage)
+  }
+
+  addLoaderCloseButton() {
+    const { closeButton } = this
+    const { file, image } = closeButton
+    PIXI.loader.add(file ? file : image)
   }
 
   addLoaderCoins() {
@@ -112,6 +119,7 @@ class CanvasCatchCoin {
     this.addLoaderCoins()
     this.addLoaderBasket()
     this.addLoaderController()
+    this.addLoaderCloseButton()
   }
 
   onPIXILoader() {
@@ -126,6 +134,7 @@ class CanvasCatchCoin {
     let timer = new Timer(this.timer)
     let countBoard = new CountBoard(this.countBoard)
     let controller = new Controller(this.controller)
+    let closeButton = new CloseButton(this.closeButton)
 
     let basketAnim = basket.pixiAnimate
     let countBoardAnim = countBoard.pixiAnimate
@@ -142,6 +151,7 @@ class CanvasCatchCoin {
 
     basket.moveEvnet()
     controller.moveEvent(basket)
+    closeButton.closeEvent(this)
 
     const animate = function(delta) {
 
@@ -427,9 +437,6 @@ class Controller{
   moveEvent(basket){
     const { leftButton, rightButton } = this
 
-    // leftButton.interactive = true
-    leftButton.buttonMode = true
-
     leftButton.on('click', function(){
       basket.position = 'left'
     })
@@ -475,6 +482,35 @@ class Timer {
     pixiAnimate.y = y
 
     app.stage.addChild(pixiAnimate)
+  }
+}
+
+class CloseButton extends PixiImage {
+  constructor(opt){
+    super(opt)
+    this.x = opt.x || app.screen.width - this.pixiAnimate.width
+    this.y = opt.y || 0
+    this.init()
+  }
+  init(){
+    const {pixiAnimate, x, y} = this
+    pixiAnimate.interactive = true
+    pixiAnimate.x = x
+    pixiAnimate.y = y
+    app.stage.addChild(pixiAnimate)
+  }
+  closeEvent(catchCoinProps){
+    let { pixiAnimate } = this
+    let { option } = catchCoinProps
+    let { id } = option
+    pixiAnimate.on('click', function(){
+      app.stop()
+      if(id){
+        document.querySelector(id).removeChild(app.view)
+      }else {
+        document.body.removeChild(app.view)
+      }
+    })
   }
 }
 

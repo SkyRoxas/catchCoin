@@ -106,6 +106,10 @@ game.controller = {
   spacing: 0
 }
 
+game.closeButton = {
+  image: './images/BtnClose.png'
+}
+
 game.gameOver = function(result){
   const { score } = result
   const level = resultLevel(score)
