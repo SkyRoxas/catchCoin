@@ -1,6 +1,9 @@
 import axios from 'axios'
 import CanvasCatchCoin from './canvasCatchCoin'
 
+
+// catchCoin
+
 const RootAPI = 'https://event.shopping.friday.tw/playfullgift/Event20180536961Action.do?eventPage=game'
 const ResStatusError = [201]
 
@@ -58,7 +61,7 @@ game.countBoard = {
 }
 
 game.timer = {
-  sec: 10,
+  sec: 25,
   fontText: 'Time:',
   fontStyle: {
     fontWeight: 'bold',
@@ -139,4 +142,69 @@ game.gameOver = function(result){
 
 window.addEventListener('load', function(){
   game.start()
+})
+
+// remind
+
+const domStr = `
+<div class="Lightbox">
+	<div class="LightboxOverlay"></div>
+	<div class="LightboxWrap Guid">
+			<div class="Content">
+				<div class="BtnClose"><a href="javascript:void(0);" title="關閉">關閉</a></div>
+				<div class="Information">
+					<div class="TimeSet"><span class="timer"></span>秒</div>
+					<label class="container">
+						<input type="checkBox" name="checkBox">
+						<span class="checkmark"></span>我已了解遊戲規則，不用再提醒。
+					</label>
+				</div>
+			</div>
+	</div>
+</div>
+`
+
+const closeRemind = ()=>{
+  let checkBoxDOM = document.querySelector('input[name="checkBox"]')
+  if(checkBoxDOM.checked){
+    localStorage.setItem('catchCoinRemind', true)
+  }
+  document.body.removeChild(document.querySelector('.Lightbox'))
+}
+
+class Timer {
+  constructor(sec){
+    this.sec = sec
+  }
+  set setSec(sec) {
+    this.sec = sec
+    document.querySelector('.Lightbox .timer').innerHTML = this.sec
+  }
+}
+
+window.addEventListener('load', function(){
+
+  if(localStorage.getItem('catchCoinRemind')) {
+    return
+  }
+
+  document.body.insertAdjacentHTML('beforeend', domStr)
+
+  let i = 1
+  const lightboxTimer = new Timer(5)
+
+  const animate = setInterval(function(){
+    lightboxTimer.setSec = 5 - i
+    i++
+    if(lightboxTimer.sec > 0) {
+      return
+    }
+    closeRemind()
+    clearInterval(animate)
+  }, 1000)
+
+  document.querySelector('.BtnClose').addEventListener('click', function(){
+    closeRemind()
+  })
+
 })
