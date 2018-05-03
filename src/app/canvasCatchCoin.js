@@ -38,8 +38,11 @@ class CanvasCatchCoin {
 
       app.stage.addChild(background)
     }
-
-    document.getElementById(id).appendChild(app.view)
+    if(id){
+      document.getElementById(id).appendChild(app.view)
+      return
+    }
+    document.body.appendChild(app.view)
   }
 
   // AddLoader
@@ -103,11 +106,7 @@ class CanvasCatchCoin {
     return arr
   }
 
-  // Event
-  gameStop() {}
-
   // Action
-
   beforePIXILoader() {
     this.addLoaderBackground()
     this.addLoaderCoins()
@@ -134,8 +133,8 @@ class CanvasCatchCoin {
 
     // 起始狀態資料
     let numberExecutions = 1
-    let deltaCount = 0
     let score = 0
+    let startSecond = Date.now()
 
     // 遊戲結束條件
     let isTimeUp = false
@@ -146,22 +145,26 @@ class CanvasCatchCoin {
 
     const animate = function(delta) {
 
-      deltaCount += delta
-      const deltaSec = Math.floor(deltaCount / app.ticker.FPS)
+      let nowSecond = Date.now()
 
-      isTimeUp = timer.sec - deltaSec < 0
+      const sec = Math.floor((nowSecond - startSecond) / 1000)
+
+      isTimeUp = timer.sec - sec < 0
 
       let isGameOver = isTimeUp || isSuddenOver
 
       basket.move(delta)
 
+      if(!isGameOver){
+        timerAnim.text = `${timer.fontText} ${timer.sec - sec} `
+      }
+
+
       // 固定時間內，加入新的一批 coin 的陣列
-      if (deltaSec >= 1 * numberExecutions && !isGameOver) {
+      if (sec >= 1 * numberExecutions && !isGameOver) {
 
-        timerAnim.text = `${timer.fontText} ${timer.sec - deltaSec} `
-
-        // 提前 3 秒停止產生金幣，與產生金幣的頻率
-        if (!(timer.sec - deltaSec < 3) && numberExecutions % productionSpeed === 0) {
+        // 提前 2 秒停止產生金幣，與產生金幣的頻率
+        if (!(timer.sec - sec < 2) && numberExecutions % productionSpeed === 0) {
           coins = coins.concat(this.createCoins())
         }
 
@@ -208,7 +211,8 @@ class CanvasCatchCoin {
       }
 
       // 時間倒數結束時，停止動畫，且觸發事件
-      if (isGameOver && coins.length === 0) {
+
+      if(coins.length === 0){
         app.ticker.stop(animate.bind(this))
         this.gameOver({
           score: score
@@ -340,7 +344,7 @@ class Basket extends PixiImage {
     if(!isSprite) {
       return
     }
-    
+
     if(position) {
       this.isMoving = true
     }

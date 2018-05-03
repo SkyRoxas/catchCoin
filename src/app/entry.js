@@ -6,16 +6,16 @@ const ResStatusError = [201]
 
 const resultLevel = function(score){
   switch (true) {
-    case (score > 10000):
+    case (score > 12000):
       return 5
       break
-    case (score > 2000):
+    case (score > 8000):
       return 4
       break
-    case (score > 1200):
+    case (score > 6000):
       return 3
       break
-    case (score > 800):
+    case (score > 4000):
       return 2
       break
     default:
@@ -26,7 +26,7 @@ const resultLevel = function(score){
 const game = new CanvasCatchCoin()
 
 game.option = {
-  id: 'catchCoin',
+  // id: 'catchCoin',
   width: window.innerWidth,
   height: window.innerHeight,
   productionSpeed: 1,
@@ -58,7 +58,7 @@ game.countBoard = {
 }
 
 game.timer = {
-  sec: 20,
+  sec: 10,
   fontText: 'Time:',
   fontStyle: {
     fontWeight: 'bold',
@@ -78,8 +78,6 @@ game.coins = [
     file: './images/sprites/copper_1.json',
     length: 6,
     speed: 400,
-    width: 10,
-    height: 10,
     scale: 5
   },
   {
@@ -87,10 +85,7 @@ game.coins = [
     file: './images/sprites/silver_1.json',
     length: 6,
     speed: 500,
-    scale: 3,
-    action: function(){
-      console.log('銀幣')
-    }
+    scale: 3
   },
   {
     score: 500,
