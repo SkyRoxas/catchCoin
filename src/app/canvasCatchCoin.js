@@ -13,15 +13,16 @@ class CanvasCatchCoin {
     this.timer = opt.timer || {}
     this.controller = opt.controller || {}
     this.closeButton = opt.closeButton || {}
+    this.pixiImages = opt.pixiImages || []
   }
 
   // init
   init() {
     const { option } = this
-    const { id, width, height, backgroundImage } = option
+    const { id, width, height, backgroundImage, transparent } = option
 
     app = new PIXI.Application(width, height, {
-      backgroundColor: 0x1099bb
+      transparent
     })
 
     if (width) {
@@ -85,6 +86,44 @@ class CanvasCatchCoin {
     PIXI.loader.add(rightImage)
   }
 
+  addLoaderPixiImages() {
+    let { pixiImages } = this
+    for (let i = 0; i < pixiImages.length; i++) {
+      let {file, image} = pixiImages[i]
+      PIXI.loader.add(file ? file : image)
+    }
+  }
+
+  // static pixiImages
+  createPixiImages() {
+    let { pixiImages } = this
+    for (let i = 0; i < pixiImages.length; i++) {
+
+      let pixiImage = new PixiImage(pixiImages[i])
+      let {pixiAnimate, file, x, y, width, height} = pixiImage
+      let isSprite = !!file
+
+      pixiAnimate.x = x
+      pixiAnimate.y = y
+      pixiAnimate.zOrder = 10
+
+      if( width ) {
+        pixiAnimate.width = width
+      }
+
+      if ( height ) {
+        pixiAnimate.height = height
+      }
+
+      if(isSprite){
+        pixiAnimate.animationSpeed = 0.2
+        pixiAnimate.play()
+      }
+
+      app.stage.addChild(pixiAnimate)
+    }
+  }
+
   // Coins
   createCoins() {
 
@@ -120,6 +159,7 @@ class CanvasCatchCoin {
     this.addLoaderBasket()
     this.addLoaderController()
     this.addLoaderCloseButton()
+    this.addLoaderPixiImages()
   }
 
   onPIXILoader() {
@@ -128,6 +168,8 @@ class CanvasCatchCoin {
     let { height, productionSpeed } = option
 
     productionSpeed = productionSpeed ? productionSpeed : 1
+
+    this.createPixiImages()
 
     let coins = this.createCoins()
     let basket = new Basket(this.basket)
@@ -152,6 +194,7 @@ class CanvasCatchCoin {
     basket.moveEvnet()
     controller.moveEvent(basket)
     closeButton.closeEvent(this)
+
 
     const animate = function(delta) {
 
@@ -252,6 +295,8 @@ class PixiImage {
   constructor(opt) {
     this.width = opt.width
     this.height = opt.height
+    this.x = opt.x
+    this.y = opt.y
     this.image = opt.image
     this.file = opt.file
     this.length = opt.length
@@ -400,7 +445,7 @@ class Controller{
     this.y = opt.y ? opt.y : 0
     this.width = opt.width
     this.height = opt.height
-    this.spacing = opt.spacing ? this.spacing : 0
+    this.spacing = opt.spacing ? opt.spacing : 0
     this.leftImage = opt.leftImage
     this.rightImage = opt.rightImage
     this.leftButton = PIXI.Sprite.fromImage(this.leftImage)
@@ -427,7 +472,7 @@ class Controller{
       }
     })
 
-    rightButton.x += (leftButton.width + spacing)
+    rightButton.x = leftButton.width + spacing + x
 
     if(!('ontouchstart' in window)){
       app.stage.addChild(rightButton)
