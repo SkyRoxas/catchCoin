@@ -7,6 +7,17 @@ import CanvasCatchCoin from './canvasCatchCoin'
 const RootAPI = 'https://event.shopping.friday.tw/playfullgift/Event20180536961Action.do?eventPage=game'
 const ResStatusError = [201]
 
+const readyLoad = function(callback){
+  if(document.readyState === 'complete'){
+    callback()
+  } else {
+    window.addEventListener('load', function(){
+
+      callback()
+    })
+  }
+}
+
 const resultLevel = function(score){
   switch (true) {
     case (score > 12000):
@@ -28,15 +39,17 @@ const resultLevel = function(score){
 
 const game = new CanvasCatchCoin()
 
-const canvasWidth = window.innerWidth > 1200 ? 1200 : window.innerWidth
+const maxScreen = 1200
+const canvasWidth = window.innerWidth > maxScreen ? maxScreen : (window.innerWidth) * (maxScreen / window.innerWidth )
+const canvasHeight = window.innerHeight * (maxScreen / window.innerWidth )
 
 game.option = {
   // id: 'catchCoin',
   width: canvasWidth,
-  height: window.innerHeight,
+  height: canvasHeight,
   productionSpeed: 1,
   transparent: true,
-  // backgroundImage: './images/bg.png',
+  // backgroundImage: 'https://shoppingplus-static.friday.tw/campian/coinsrain/images/bg.png',
   maxCoin: 6,
   minCoin: 3
 }
@@ -44,7 +57,7 @@ game.option = {
 game.basket = {
   width: 530 * 0.5,
   height: 1020 * 0.5,
-  file: './images/sprites/re_4.json',
+  file: 'https://shoppingplus-static.friday.tw/campian/coinsrain/images/sprites/re_4.json',
   length: 2,
   speed: 300,
 }
@@ -85,21 +98,21 @@ game.timer = {
 game.coins = [
   {
     score: 100,
-    file: './images/sprites/copper_1.json',
+    file: 'https://shoppingplus-static.friday.tw/campian/coinsrain/images/sprites/copper_1.json',
     length: 6,
     speed: 400,
     scale: 5
   },
   {
     score: 300,
-    file: './images/sprites/silver_1.json',
+    file: 'https://shoppingplus-static.friday.tw/campian/coinsrain/images/sprites/silver_1.json',
     length: 6,
     speed: 500,
     scale: 3
   },
   {
     score: 500,
-    file: './images/sprites/golden_1.json',
+    file: 'https://shoppingplus-static.friday.tw/campian/coinsrain/images/sprites/golden_1.json',
     length: 6,
     speed: 600,
     scale: 2
@@ -107,24 +120,24 @@ game.coins = [
 ]
 
 game.controller = {
-  leftImage: './images/controller/left.png',
-  rightImage: './images/controller/right.png',
+  leftImage: 'https://shoppingplus-static.friday.tw/campian/coinsrain/images/controller/left.png',
+  rightImage: 'https://shoppingplus-static.friday.tw/campian/coinsrain/images/controller/right.png',
   x: (canvasWidth - (136 * 2)) - 100,
-  y: window.innerHeight - 104 - 30,
+  y: canvasHeight - 104 - 30,
   width: 136,
   height: 104,
   spacing: 20
 }
 
 game.closeButton = {
-  image: './images/BtnClose.png'
+  image: 'https://shoppingplus-static.friday.tw/campian/coinsrain/images/BtnClose.png'
 }
 
 game.pixiImages = [
   {
     x: canvasWidth - 530,
     y: 0,
-    image: './images/countborad.png',
+    image: 'https://shoppingplus-static.friday.tw/campian/coinsrain/images/countborad.png',
   }
 ]
 
@@ -155,9 +168,7 @@ game.gameOver = function(result){
   console.log(`分數 ${score} : ${level} 星`)
 }
 
-window.addEventListener('load', function(){
-  game.start()
-})
+readyLoad(game.start.bind(game))
 
 // remind
 
@@ -197,7 +208,8 @@ class Timer {
   }
 }
 
-window.addEventListener('load', function(){
+
+readyLoad(function(){
 
   if(localStorage.getItem('catchCoinRemind')) {
     return
