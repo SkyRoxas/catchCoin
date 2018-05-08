@@ -41,7 +41,7 @@ const game = new CanvasCatchCoin()
 
 const maxScreen = 1200
 const canvasWidth = window.innerWidth > maxScreen ? maxScreen : (window.innerWidth) * (maxScreen / window.innerWidth )
-const canvasHeight = window.innerHeight * (maxScreen / window.innerWidth )
+const canvasHeight = window.innerWidth > maxScreen ? window.innerHeight : window.innerHeight * (maxScreen / window.innerWidth )
 
 game.option = {
   // id: 'catchCoin',
