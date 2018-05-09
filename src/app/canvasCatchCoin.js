@@ -536,6 +536,7 @@ class CloseButton extends PixiImage {
     this.x = opt.x || app.screen.width - this.pixiAnimate.width
     this.y = opt.y || 0
     this.init()
+    this.action = opt.action
   }
   init(){
     const {pixiAnimate, x, y} = this
@@ -545,7 +546,7 @@ class CloseButton extends PixiImage {
     app.stage.addChild(pixiAnimate)
   }
   closeEvent(catchCoinProps){
-    let { pixiAnimate } = this
+    let { pixiAnimate, action } = this
     let { option } = catchCoinProps
     let { id } = option
     pixiAnimate.on('click', function(){
@@ -554,6 +555,9 @@ class CloseButton extends PixiImage {
         document.querySelector(id).removeChild(app.view)
       }else {
         document.body.removeChild(app.view)
+      }
+      if(action){
+        action()
       }
     })
   }

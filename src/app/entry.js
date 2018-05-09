@@ -12,7 +12,6 @@ const readyLoad = function(callback){
     callback()
   } else {
     window.addEventListener('load', function(){
-
       callback()
     })
   }
@@ -38,6 +37,26 @@ const resultLevel = function(score){
 }
 
 const game = new CanvasCatchCoin()
+
+const domShow = function(){
+  if(document.getElementsByClassName('Idol')[0]){
+      document.getElementsByClassName('Idol')[0].style.display = 'block'
+  }
+
+  if(document.getElementById('coin_rain_icon')){
+      document.getElementById('coin_rain_icon').style.display = 'block'
+  }
+}
+
+const domHidden = function(){
+  if(document.getElementsByClassName('Idol')[0]){
+      document.getElementsByClassName('Idol')[0].style.display = 'none'
+  }
+
+  if(document.getElementById('coin_rain_icon')){
+      document.getElementById('coin_rain_icon').style.display = 'none'
+  }
+}
 
 let scale = window.innerHeight / window.innerWidth // 寬高比例
 let isHeightBetterWidth = window.innerHeight > window.innerWidth
@@ -134,7 +153,10 @@ game.controller = {
 game.closeButton = {
   image: 'https://shoppingplus-static.friday.tw/campian/coinsrain/images/BtnClose.png',
   width: isHeightBetterWidth ? (75 * scale) : 75,
-  heigth: isHeightBetterWidth ? (75 * scale) : 75
+  heigth: isHeightBetterWidth ? (75 * scale) : 75,
+  action: function(){
+    domShow()
+  }
 }
 
 game.pixiImages = [
@@ -177,9 +199,8 @@ game.gameOver = function(result){
 
   console.log(`分數 ${score} : ${level} 星`)
 
-  if(document.getElementsByClassName('Idol')[0]){
-      document.getElementsByClassName('Idol')[0].style.display = 'none'
-  }
+  domShow()
+
 }
 
 readyLoad(game.start.bind(game))
@@ -205,7 +226,13 @@ const domStr = `
 `
 
 const closeRemind = ()=>{
+
+  if(!document.querySelector('input[name="checkBox"]')){
+    return
+  }
+
   let checkBoxDOM = document.querySelector('input[name="checkBox"]')
+
   if(checkBoxDOM.checked){
     localStorage.setItem('catchCoinRemind', true)
   }
@@ -253,7 +280,5 @@ readyLoad(function(){
 })
 
 readyLoad(function(){
-  if(document.getElementsByClassName('Idol')[0]){
-      document.getElementsByClassName('Idol')[0].style.display = 'none'
-  }
+  domHidden()
 })
