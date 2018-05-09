@@ -14,9 +14,416 @@
 
 canvas
   position: fixed
-  top: 0
+  bottom: 0
   left: 50%
   max-width: 100%
+  width: 1200px
   transform: translateX(-50%)
   z-index: 100
-  pointer-events: none
+  user-select: none
+
+
+.Lightbox
+  position: relative
+  color: #fff
+  font-family: "Noto Sans TC", "Century Gothic"
+  font-size: 100%
+  line-height: 1.5
+
+  .LightboxOverlay
+    position: fixed
+    top: 0
+    bottom: 0
+    left: 0
+    right: 0
+    background: rgba(0, 0, 0, 0.75)
+    z-index: 100
+
+
+  .LightboxWrap
+    position: fixed
+    z-index: 101
+    left: 50%
+    top: 50%
+    transform: translate(-50%, -50%)
+    background: url(../images/Lightbox.png) no-repeat
+    width: 575px
+    height: 650px
+    font-size: 1.2rem
+
+
+  .Guid
+    background: url(../images/LightboxGuid.png) no-repeat
+    width: 640px
+    height: 652px
+
+
+  .BtnClose
+    position: absolute
+    right: -5%
+    top: -1%
+    z-index: 2
+
+
+  .BtnClose a
+    width: 75px
+    height: 75px
+    text-indent: -9999px
+    background: url(../images/BtnClose.png) no-repeat
+    line-height: 1
+    display: block
+    z-index: 2
+
+
+  .LightboxFb
+    border-radius: 20px
+    background: #fff url(../images/BgFb.png) no-repeat bottom
+    border: 15px solid #1c407b
+    padding: 3%
+    width: 950px
+    box-sizing: border-box
+    overflow: hidden
+
+
+  .LightboxLine
+    border-radius: 20px
+    background: #fff url(../images/Bgline.png) no-repeat bottom
+    border: 15px solid #00b900
+    padding: 3% 0
+    width: 542px
+    box-sizing: border-box
+    overflow: hidden
+
+
+  .Message .Information
+    position: relative
+    text-align: center
+    padding-top: 30%
+
+
+  .Information .LinkShare
+    position: absolute
+    width: 180px
+    height: 45px
+    display: block
+    text-indent: -9999px
+    top: 135px
+    left: 76px
+
+
+  .container
+    display: block
+    position: relative
+    cursor: pointer
+    font-size: 1.8rem
+    -webkit-user-select: none
+    -moz-user-select: none
+    -ms-user-select: none
+    user-select: none
+    padding-left: 84px
+    margin: 0 auto
+    text-align: center
+
+
+  .container input
+    position: absolute
+    opacity: 0
+    cursor: pointer
+
+
+  .checkmark
+    display: inline-block
+    margin-right: 10px
+    height: 20px
+    width: 20px
+    background-color: transparent
+    border: 2px solid #fff
+    vertical-align: middle
+    position: relative
+
+
+  .checkmark:after
+    content: ""
+    position: absolute
+    display: none
+    top: -7px
+    left: 0
+
+
+  .container input:checked~.checkmark:after
+    display: block
+
+
+  .container .checkmark:after
+    background: url(../images/IconSelect.png) no-repeat
+    width: 30px
+    height: 30px
+
+
+  .TimeSet
+    position: absolute
+    right: 4%
+    top: 20%
+    width: 17%
+
+
+  .TimeSet span
+    font-size: 2rem
+    margin-right: 5%
+
+
+  .LightboxWrap h3
+    font-size: 2.5rem
+    padding: 20% 0 3%
+    text-align: center
+    line-height: 1.2
+
+
+  .LightboxWrap .Information
+    flex-direction: row
+    display: flex
+    text-align: center
+
+
+  .Status1 h3
+    padding-bottom: 10%
+
+
+  .Status1 .Idol
+    background: url(../images/idol01.png) no-repeat
+    width: 40%
+    height: 0
+    padding-bottom: 64%
+    background-size: cover
+
+
+  .Status2 .Idol
+    background: url(../images/idol02.png) no-repeat
+    width: 47%
+    height: 0
+    padding-bottom: 65%
+    background-size: cover
+    margin-left: -7%
+
+
+  .Status3 .Idol
+    background: url(../images/idol03.png) no-repeat
+    width: 47%
+    height: 0
+    padding-bottom: 64%
+    background-size: cover
+    margin-left: -7%
+
+
+  .Status4 .Idol
+    background: url(../images/idol04.png) no-repeat
+    width: 47%
+    height: 0
+    padding-bottom: 64%
+    background-size: cover
+    margin-left: -7%
+
+
+  .Status5 .Idol
+    background: url(../images/idol05.png) no-repeat
+    width: 47%
+    height: 0
+    padding-bottom: 70%
+    background-size: cover
+    margin-left: -7%
+
+
+  .Wording span
+    font-size: 2.5rem
+    font-family: 'Century Gothic'
+
+
+  .LightHeight
+    background-color: #ffa531
+    color: #fff
+    font-size: 1.7rem
+    padding: 0 4%
+    margin: 10% 0 5%
+
+
+  .LinkTo a
+    border-bottom: 1px solid #fff
+    padding-bottom: 1%
+
+
+  .LinkTo
+    margin-bottom: 5%
+
+
+  .LinkTo
+    margin-bottom: 5%
+
+
+  .GiftInfor
+    margin: 0 1%
+
+
+  .WordingShare
+    font-size: 1.7rem
+
+
+  .WordingShare .C1
+    font-family: 'Century Gothic'
+    color: #fcff00
+
+
+  .WordingShare .C2
+    font-family: 'Century Gothic'
+    font-size: 3rem
+    color: #fcff00
+
+
+  .ButtonBar ul li
+    display: inline-block
+    text-align: center
+    width: 35%
+
+
+  .ButtonBar ul li a
+    margin: auto
+
+
+  .ButtonBar ul li:first-child a
+    background: url(../images/BtnFbShare.png) no-repeat
+    width: 98px
+    height: 42px
+    text-indent: -9999px
+    display: block
+
+
+  .ButtonBar ul li:last-child a
+    background: url(../images/BtnLineShare.png) no-repeat
+    width: 98px
+    height: 42px
+    text-indent: -9999px
+    display: block
+
+
+  .Guid .Information
+    padding-top: 84%
+
+
+  @media screen and (max-width:768px)
+    *
+      margin: 0
+      padding: 0
+
+    body, html
+      box-sizing: border-box
+      -webkit-box-sizing: border-box
+
+    img
+      width: 100%
+      height: auto
+
+    .Bg
+      background: url(../images/header_m.jpg) no-repeat top center/cover
+      height: 100%
+      width: 100%
+
+    .LightboxWrap
+      background-size: 100%
+      width: 82%
+      height: 0
+      padding-bottom: 105%
+      font-size: .9rem
+
+    .Guid
+      background: url(../images/LightboxGuid_m.png) no-repeat
+      padding-bottom: 83%
+      background-size: cover
+
+    .BtnClose
+      top: -6%
+      right: -2%
+
+    .BtnClose a
+      width: 37px
+      height: 37px
+      background-size: 100%
+
+    .container
+      padding-left: 0
+      font-size: .7rem
+
+    .ButtonBar ul li
+      width: 40%
+
+    .ButtonBar ul li:first-child a
+      width: 100%
+      height: 0
+      padding-bottom: 44%
+      background-size: 100%
+
+    .ButtonBar ul li:last-child a
+      width: 100%
+      height: 0
+      padding-bottom: 44%
+      background-size: 100%
+
+    .TimeSet span
+      font-size: 1rem
+
+    .checkmark
+      width: 10px
+      height: 10px
+
+    .container .checkmark:after
+      width: 15px
+      height: 15px
+      background-size: cover
+
+    .LightboxWrap h3
+      font-size: 1.2rem
+      padding-bottom: 1%
+
+    .Status1 .Idol
+      padding-bottom: 54%
+
+    .Status2 .Idol
+      padding-bottom: 62%
+
+    .Status3 .Idol
+      padding-bottom: 61%
+
+    .Wording span
+      font-size: 1.3rem
+
+    .LightHeight
+      font-size: 1rem
+      margin: 1% 0
+
+    .WordingShare
+      font-size: .7rem
+
+    .WordingShare .C2
+      font-size: 1.5rem
+
+    .LinkTo a
+      font-size: .7rem
+
+    .LinkTo
+      margin-bottom: 1%
+
+
+
+  @-moz-document url-prefix()
+    .Status1 .Idol
+      height: auto
+
+    .Status2 .Idol
+      height: auto
+
+    .Status3 .Idol
+      height: auto
+
+    .Status4 .Idol
+      height: auto
+
+    .Status5 .Idol
+      height: auto

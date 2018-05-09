@@ -5,7 +5,7 @@ import CanvasCatchCoin from './canvasCatchCoin'
 // catchCoin
 
 const RootAPI = 'https://event.shopping.friday.tw/playfullgift/Event20180536961Action.do?eventPage=game'
-const ResStatusError = [201]
+const ResStatusError = []
 
 const readyLoad = function(callback){
   if(document.readyState === 'complete'){
@@ -39,9 +39,11 @@ const resultLevel = function(score){
 
 const game = new CanvasCatchCoin()
 
-const maxScreen = 1200
-const canvasWidth = window.innerWidth > maxScreen ? maxScreen : (window.innerWidth) * (maxScreen / window.innerWidth )
-const canvasHeight = window.innerWidth > maxScreen ? window.innerHeight : window.innerHeight * (maxScreen / window.innerWidth )
+let scale = window.innerHeight / window.innerWidth // 寬高比例
+let isHeightBetterWidth = window.innerHeight > window.innerWidth
+
+let canvasWidth = 1440 //實際寬度
+let canvasHeight = isHeightBetterWidth ? (canvasWidth * scale) : window.innerHeight
 
 game.option = {
   // id: 'catchCoin',
@@ -49,27 +51,27 @@ game.option = {
   height: canvasHeight,
   productionSpeed: 1,
   transparent: true,
-  // backgroundImage: 'https://shoppingplus-static.friday.tw/campian/coinsrain/images/bg.png',
+  // backgroundImage: './images/bg.png',
   maxCoin: 6,
   minCoin: 3
 }
 
 game.basket = {
-  width: 530 * 0.5,
-  height: 1020 * 0.5,
+  width: isHeightBetterWidth ? (530 * 0.5 * scale) : 530 * 0.5,
+  height: isHeightBetterWidth ? (1020 * 0.5 * scale) : 1020 * 0.5,
   file: 'https://shoppingplus-static.friday.tw/campian/coinsrain/images/sprites/re_4.json',
   length: 2,
-  speed: 300,
+  speed: isHeightBetterWidth ? 300 : (300 * scale),
 }
 
 game.countBoard = {
-  fontText: 'seconds :',
-  x: canvasWidth - 500,
-  y: 70,
+  fontText: 'counts :',
+  x: isHeightBetterWidth ? canvasWidth - (500 * scale) : canvasWidth - 500,
+  y: isHeightBetterWidth ? (70 * scale) : 70,
   fontStyle: {
     fontWeight: 'bold',
     fontStyle: 'italic',
-    fontSize: 35,
+    fontSize: isHeightBetterWidth ? (35 * scale) : 35,
     fontFamily: 'Arvo',
     fill: '#fff',
     align: 'center',
@@ -80,13 +82,13 @@ game.countBoard = {
 
 game.timer = {
   sec: 25,
-  x: canvasWidth - 500,
-  y: 120,
-  fontText: 'counts :',
+  x: isHeightBetterWidth ? canvasWidth - (500 * scale) : canvasWidth - 500,
+  y: isHeightBetterWidth ? (120 * scale) : 120,
+  fontText: 'seconds :',
   fontStyle: {
     fontWeight: 'bold',
     fontStyle: 'italic',
-    fontSize: 35,
+    fontSize: isHeightBetterWidth ? (35 * scale) : 35,
     fontFamily: 'Arvo',
     fill: '#fff',
     align: 'center',
@@ -130,14 +132,18 @@ game.controller = {
 }
 
 game.closeButton = {
-  image: 'https://shoppingplus-static.friday.tw/campian/coinsrain/images/BtnClose.png'
+  image: 'https://shoppingplus-static.friday.tw/campian/coinsrain/images/BtnClose.png',
+  width: isHeightBetterWidth ? (75 * scale) : 75,
+  heigth: isHeightBetterWidth ? (75 * scale) : 75
 }
 
 game.pixiImages = [
   {
-    x: canvasWidth - 530,
+    x: isHeightBetterWidth ? canvasWidth - (530 * scale) : canvasWidth - 530,
     y: 0,
     image: 'https://shoppingplus-static.friday.tw/campian/coinsrain/images/countborad.png',
+    width: isHeightBetterWidth ? (330 * scale) : 330,
+    height: isHeightBetterWidth ? (240 * scale) : 240
   }
 ]
 
@@ -145,10 +151,15 @@ game.gameOver = function(result){
   const { score } = result
   const level = resultLevel(score)
 
-  axios.post(RootAPI, {
-    score: score,
-    level: level
-  })
+  const action = axios.create({
+   withCredentials: true,
+   params: {
+        score: score,
+        level: level
+      }
+    })
+
+  action.post(RootAPI)
   .then( res => {
     if( ResStatusError.indexOf(res.status) !== -1) {
       throw new Error('Network response was not ok.')
@@ -164,8 +175,11 @@ game.gameOver = function(result){
     ))
   })
 
-
   console.log(`分數 ${score} : ${level} 星`)
+
+  if(document.getElementsByClassName('Idol')[0]){
+      document.getElementsByClassName('Idol')[0].style.display = 'none'
+  }
 }
 
 readyLoad(game.start.bind(game))
@@ -204,10 +218,12 @@ class Timer {
   }
   set setSec(sec) {
     this.sec = sec
+    if(!document.querySelector('.Lightbox .timer')){
+      return
+    }
     document.querySelector('.Lightbox .timer').innerHTML = this.sec
   }
 }
-
 
 readyLoad(function(){
 
@@ -234,4 +250,10 @@ readyLoad(function(){
     closeRemind()
   })
 
+})
+
+readyLoad(function(){
+  if(document.getElementsByClassName('Idol')[0]){
+      document.getElementsByClassName('Idol')[0].style.display = 'none'
+  }
 })
