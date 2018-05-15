@@ -13,15 +13,16 @@ class CanvasCatchCoin {
     this.timer = opt.timer || {}
     this.controller = opt.controller || {}
     this.closeButton = opt.closeButton || {}
+    this.backgroundImages = opt.backgroundImages || []
   }
 
   // init
   init() {
     const { option } = this
-    const { id, width, height, backgroundImage } = option
+    const { id, width, height, transparent } = option
 
     app = new PIXI.Application(width, height, {
-      backgroundColor: 0x1099bb
+      transparent
     })
 
     if (width) {
@@ -32,13 +33,6 @@ class CanvasCatchCoin {
       app.view.height = height
     }
 
-    if (backgroundImage) {
-      const background = PIXI.Sprite.fromImage(backgroundImage)
-
-      PIXITool.backgroundCover(background)
-
-      app.stage.addChild(background)
-    }
     if(id){
       document.getElementById(id).appendChild(app.view)
       return
@@ -48,19 +42,12 @@ class CanvasCatchCoin {
 
   // AddLoader
 
-  addLoaderBackground() {
-    const { option } = this
-    const { backgroundImage } = option
-    if ( !backgroundImage ) {
-      return
-    }
-    PIXI.loader.add(backgroundImage)
-  }
-
   addLoaderCloseButton() {
     const { closeButton } = this
-    const { file, image } = closeButton
-    PIXI.loader.add(file ? file : image)
+    const { image } = closeButton
+    if ( image ){
+      PIXI.loader.add(image)
+    }
   }
 
   addLoaderCoins() {
@@ -81,8 +68,52 @@ class CanvasCatchCoin {
   addLoaderController() {
     const { controller } = this
     const { leftImage, rightImage } = controller
-    PIXI.loader.add(leftImage)
-    PIXI.loader.add(rightImage)
+    if( leftImage ) {
+      PIXI.loader.add(leftImage)
+    }
+    if( rightImage ){
+      PIXI.loader.add(rightImage)
+    }
+  }
+
+  addLoaderBackgroundImages() {
+    let { backgroundImages } = this
+    for (let i = 0; i < backgroundImages.length; i++) {
+      let {file, image} = backgroundImages[i]
+      PIXI.loader.add(file ? file : image)
+    }
+  }
+
+  // static backgroundImages
+  createPixiImages() {
+    let { backgroundImages } = this
+    console.log(backgroundImages)
+    for (let i = 0; i < backgroundImages.length; i++) {
+
+      let pixiImage = new PixiImage(backgroundImages[i])
+
+      let {pixiAnimate, file, x, y, width, height} = pixiImage
+      let isSprite = !!file
+
+      pixiAnimate.x = x
+      pixiAnimate.y = y
+      pixiAnimate.zOrder = 10
+
+      if( width ) {
+        pixiAnimate.width = width
+      }
+
+      if ( height ) {
+        pixiAnimate.height = height
+      }
+
+      if(isSprite){
+        pixiAnimate.animationSpeed = 0.2
+        pixiAnimate.play()
+      }
+
+      app.stage.addChild(pixiAnimate)
+    }
   }
 
   // Coins
@@ -115,11 +146,11 @@ class CanvasCatchCoin {
 
   // Action
   beforePIXILoader() {
-    this.addLoaderBackground()
     this.addLoaderCoins()
     this.addLoaderBasket()
     this.addLoaderController()
     this.addLoaderCloseButton()
+    this.addLoaderBackgroundImages()
   }
 
   onPIXILoader() {
@@ -129,11 +160,15 @@ class CanvasCatchCoin {
 
     productionSpeed = productionSpeed ? productionSpeed : 1
 
+    this.createPixiImages()
+
     let coins = this.createCoins()
     let basket = new Basket(this.basket)
     let timer = new Timer(this.timer)
     let countBoard = new CountBoard(this.countBoard)
     let controller = new Controller(this.controller)
+
+    console.log(this.closeButton)
     let closeButton = new CloseButton(this.closeButton)
 
     let basketAnim = basket.pixiAnimate
@@ -152,6 +187,7 @@ class CanvasCatchCoin {
     basket.moveEvnet()
     controller.moveEvent(basket)
     closeButton.closeEvent(this)
+
 
     const animate = function(delta) {
 
@@ -221,7 +257,6 @@ class CanvasCatchCoin {
       }
 
       // 時間倒數結束時，停止動畫，且觸發事件
-
       if(coins.length === 0){
         app.ticker.stop(animate.bind(this))
         this.gameOver({
@@ -252,6 +287,8 @@ class PixiImage {
   constructor(opt) {
     this.width = opt.width
     this.height = opt.height
+    this.x = opt.x || 0
+    this.y = opt.y || 0
     this.image = opt.image
     this.file = opt.file
     this.length = opt.length
@@ -396,11 +433,11 @@ class Basket extends PixiImage {
 
 class Controller{
   constructor(opt){
-    this.x = opt.x ? opt.x : 0
-    this.y = opt.y ? opt.y : 0
+    this.x = opt.x || 0
+    this.y = opt.y || 0
     this.width = opt.width
     this.height = opt.height
-    this.spacing = opt.spacing ? this.spacing : 0
+    this.spacing = opt.spacing || 0
     this.leftImage = opt.leftImage
     this.rightImage = opt.rightImage
     this.leftButton = PIXI.Sprite.fromImage(this.leftImage)
@@ -427,7 +464,7 @@ class Controller{
       }
     })
 
-    rightButton.x += (leftButton.width + spacing)
+    rightButton.x = leftButton.width + spacing + x
 
     if(!('ontouchstart' in window)){
       app.stage.addChild(rightButton)
@@ -490,20 +527,31 @@ class CloseButton extends PixiImage {
     super(opt)
     this.x = opt.x || app.screen.width - this.pixiAnimate.width
     this.y = opt.y || 0
+    this.width = opt.width
+    this.height = opt.height
     this.init()
   }
   init(){
-    const {pixiAnimate, x, y} = this
+    const {pixiAnimate, x, y, width, height} = this
     pixiAnimate.interactive = true
     pixiAnimate.x = x
     pixiAnimate.y = y
+
+    if( width ) {
+      pixiAnimate.width = width
+    }
+    if ( height ) {
+      pixiAnimate.height = height
+    }
+
     app.stage.addChild(pixiAnimate)
   }
   closeEvent(catchCoinProps){
     let { pixiAnimate } = this
     let { option } = catchCoinProps
     let { id } = option
-    pixiAnimate.on('click', function(){
+    let buttonEvent = ('ontouchstart' in document.documentElement) ? 'touchstart' : 'click'
+    pixiAnimate.on(buttonEvent, function(){
       app.stop()
       if(id){
         document.querySelector(id).removeChild(app.view)
@@ -520,7 +568,7 @@ class PIXITool {
     let frames = []
     let fileName = spriteJson.match(/.+\/(.+)\.json/) ? spriteJson.match(/.+\/(.+)\.json/)[1] : ''
 
-    startIndex = startIndex ? startIndex : 0
+    startIndex = startIndex || 0
     let index = 0
 
     for (let i = 0; i < spriteLength; i++) {
@@ -560,10 +608,12 @@ class Tool {
   static createRandom(min, max) {
     return Math.floor(Math.random() * (Math.floor(max) - Math.ceil(min))) + Math.ceil(min)
   }
-  static gcd(m, n) {
-    return n === 0 ? m : this.gcd(n, m % n)
-  }
 }
 
+if(window.CanvasCatchCoin === undefined){
+  window.CanvasCatchCoin = CanvasCatchCoin
+}else {
+  throw new Error('CanvasCatchCoin is ready defined on the window')
+}
 
 export default CanvasCatchCoin

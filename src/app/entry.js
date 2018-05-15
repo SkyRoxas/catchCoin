@@ -1,39 +1,22 @@
-import axios from 'axios'
 import CanvasCatchCoin from './canvasCatchCoin'
-
-const RootAPI = 'https://event.shopping.friday.tw/playfullgift/Event20180536961Action.do?eventPage=game'
-const ResStatusError = [201]
-
-const resultLevel = function(score){
-  switch (true) {
-    case (score > 12000):
-      return 5
-      break
-    case (score > 8000):
-      return 4
-      break
-    case (score > 6000):
-      return 3
-      break
-    case (score > 4000):
-      return 2
-      break
-    default:
-      return 1
-  }
-}
 
 const game = new CanvasCatchCoin()
 
 game.option = {
-  // id: 'catchCoin',
-  width: window.innerWidth,
-  height: window.innerHeight,
+  width: 600,
+  height: 902,
   productionSpeed: 1,
-  // backgroundImage: './images/bg.png',
   maxCoin: 6,
-  minCoin: 3
+  minCoin: 3,
 }
+
+game.backgroundImages = [
+  {
+    image: './images/bg.png',
+    width: 1848,
+    height: 902
+  }
+]
 
 game.basket = {
   width: 500 * 0.8,
@@ -99,11 +82,11 @@ game.coins = [
 game.controller = {
   leftImage: './images/controller/left.png',
   rightImage: './images/controller/right.png',
-  x: window.innerWidth - (206 * 2),
-  y: window.innerHeight - 260,
-  width: 206,
-  height: 260,
-  spacing: 0
+  x: 600 - (206 * 2) - 10,
+  y: 902,
+  width: 206 * 0.5,
+  height: 260 * 0.5,
+  spacing: 10
 }
 
 game.closeButton = {
@@ -111,30 +94,8 @@ game.closeButton = {
 }
 
 game.gameOver = function(result){
-  const { score } = result
-  const level = resultLevel(score)
-
-  axios.post(RootAPI, {
-    score: score,
-    level: level
-  })
-  .then( res => {
-    if( ResStatusError.indexOf(res.status) !== -1) {
-      throw new Error('Network response was not ok.')
-    }
-  })
-  .catch( () => {
-    console.log('error')
-    localStorage.setItem('gameResult', JSON.stringify(
-      {
-        score: score,
-        level: level
-      }
-    ))
-  })
-
-
-  console.log(`分數 ${score} : ${level} 星`)
+  let {score} = result
+  alert(`遊戲結束您的分數為： ${score}`)
 }
 
 window.addEventListener('load', function(){
