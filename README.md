@@ -2,8 +2,9 @@
 
 ## 使用說明
 
-```
-```
+## demo
+
+<img src="./src/images/demo.gif">
 
 ## API
 
